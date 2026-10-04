@@ -33,6 +33,5 @@ Every push to `main` deploys, so push only what is ready.
 ## Open on prod (as of 2026-09-30)
 - Settings → Payments → "Public API address" still `http://localhost:8080` (from the snapshot): set it to
   `https://api.scentology.bd`. Every courier webhook and payment callback URL is built from it.
-- Image links in the DB still point at `http://localhost:9000/ecom/`: run `ecom-api/scripts/rewrite-image-links.js` on the host with mongosh (the files are
-  already in the S3 bucket). Until then snapshot product images don't load on the storefront.
+- Image links rewritten to S3 on 2026-10-05 (`scripts/rewrite-image-links.js`, 212 docs). A new snapshot restore on prod needs it again.
 - No real Orb send verified yet (use Notifications → Send test). SMS account not set up.
