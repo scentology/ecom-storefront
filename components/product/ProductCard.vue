@@ -1,5 +1,5 @@
 <script setup>
-// Grid card: image (second image on hover), brand/category eyebrow, title, colour dots, price; heart saves it.
+// Grid card: image (second image on hover), brand/category eyebrow, title, colour dots, price; heart adds it to the wishlist.
 const props = defineProps({ product: { type: Object, required: true }, eager: Boolean })
 const saved = useWishlist()
 const price = computed(() => priceOf(props.product))
@@ -48,7 +48,7 @@ const soldOut = computed(() => (props.product.variants || []).length > 0 && onli
     <ClientOnly>
       <button
         class="absolute right-3 top-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-card transition hover:scale-105"
-        :aria-label="saved.has(product._id) ? 'Remove from saved' : 'Save'" :aria-pressed="saved.has(product._id)" @click="saved.toggle(product._id)"
+        :aria-label="saved.has(product._id) ? 'Remove from wishlist' : 'Add to wishlist'" :aria-pressed="saved.has(product._id)" @click="saved.toggle(product._id, null, product)"
       >
         <Icon name="lucide:heart" class="w-4 h-4" :class="saved.has(product._id) ? 'text-sale fill-current' : 'text-ink'" />
       </button>

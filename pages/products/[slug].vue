@@ -207,7 +207,7 @@ useHead({
           </div>
           <button class="s-btn-dark flex-1" :disabled="!inStock" @click="addToBag"><Icon name="lucide:shopping-bag" class="w-4 h-4" /> {{ inStock ? 'Add to bag' : 'Sold out' }}</button>
           <ClientOnly>
-            <button class="s-btn-line !px-4" :aria-pressed="saved.has(p._id)" :aria-label="saved.has(p._id) ? 'Remove from saved' : 'Save'" @click="saved.toggle(p._id)">
+            <button class="s-btn-line !px-4" :aria-pressed="saved.has(p._id)" :aria-label="saved.has(p._id) ? 'Remove from wishlist' : 'Add to wishlist'" @click="saved.toggle(p._id, variant?._id, p)">
               <Icon name="lucide:heart" class="w-5 h-5" :class="saved.has(p._id) ? 'text-sale fill-current' : ''" />
             </button>
           </ClientOnly>

@@ -1,5 +1,5 @@
 <script setup>
-// Centred logo; the main menu (from the admin's menu builder) on the left with mega dropdowns; search, saved,
+// Centred logo; the main menu (from the admin's menu builder) on the left with mega dropdowns; search, wishlist,
 // bag and account on the right. Phones get a drill-down menu.
 const { data: menu } = await useMenu()
 const cart = useCart()
@@ -70,7 +70,7 @@ const compact = computed(() => (items.value?.length || 0) > 5)
       <!-- right -->
       <div class="flex items-center justify-end gap-0.5 sm:gap-1.5">
         <button class="p-2.5 hover:text-gold transition-colors" aria-label="Search (press /)" @click="searchOpen = true"><Icon name="lucide:search" class="w-5 h-5" /></button>
-        <NuxtLink to="/saved" class="relative p-2.5 hover:text-gold transition-colors hidden sm:inline-flex" aria-label="Saved items">
+        <NuxtLink to="/wishlist" class="relative p-2.5 hover:text-gold transition-colors hidden sm:inline-flex" aria-label="Wishlist">
           <Icon name="lucide:heart" class="w-5 h-5" />
           <ClientOnly><span v-if="saved.ids.value.length" class="absolute top-1 right-0.5 min-w-4 h-4 px-1 rounded-full bg-gold text-noir-900 text-[0.62rem] font-bold flex items-center justify-center">{{ saved.ids.value.length }}</span></ClientOnly>
         </NuxtLink>

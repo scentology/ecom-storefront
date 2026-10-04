@@ -112,3 +112,8 @@
 - `HomeSplit`: picture in a rounded 4:5 frame (4:3 on phones) inside the container, `focus` + `image_left`.
 - Big screens: root font-size grows from 1600px wide (to 24px max), so rem layouts scale instead of leaving a narrow column.
 - Listing quick chips only offer values present on the listed products.
+
+## 2026-10-05 — Server wishlist
+
+- `useWishlist`: signed in, the API list is the source of truth (`GET/PUT/DELETE /wishlist`, `POST /wishlist/merge` with the local ids on sign-in/app start, local list cleared after a successful merge); guests keep `ecom_saved_v1`. Watchers live in a detached `effectScope` so they outlive the first caller. Toggle is optimistic with rollback + toast; product page saves the selected variant.
+- `/wishlist` page (picked size/colour, price, stock, Add to bag with the picked variant or Choose options, remove; guest sign-in prompt); `/saved` redirects to it. Header/phone menu say "Wishlist".
