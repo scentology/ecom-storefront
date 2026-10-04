@@ -90,6 +90,12 @@ const chosen = computed(() => [
 // live counts (values in the current results, not every product alike), at most 6; chosen ones always stay
 const QUICK = 6
 const scopeIds = computed(() => (sub.value ? [sub.value._id, category.value._id] : category.value ? [category.value._id, ...category.value.children.map((c) => c._id)] : []))
+// values on the products in view: the counts ignore the brand filter, so they can't tell on their own
+const present = computed(() => {
+  const set = new Set()
+  for (const p of data.value?.data || []) for (const [attr, vals] of Object.entries(p.facets || {})) for (const v of vals) set.add(`${attr}:${v}`)
+  return set
+})
 const quick = computed(() => {
   const ids = scopeIds.value
   const attrs = attributes.value
@@ -98,7 +104,7 @@ const quick = computed(() => {
     .sort((a, b) => (ids.length ? (b.category_ids?.length ? 1 : 0) - (a.category_ids?.length ? 1 : 0) : 0) || (a.sort || 0) - (b.sort || 0))
   const on = (a, v) => !!selectedFacets.value[a.slug]?.includes(v.slug)
   const lists = attrs.map((a) => a.values
-    .filter((v) => on(a, v) || (countOf(a.slug, v.slug) > 0 && countOf(a.slug, v.slug) < total.value))
+    .filter((v) => on(a, v) || (present.value.has(`${a.slug}:${v.slug}`) && countOf(a.slug, v.slug) < total.value))
     .sort((x, y) => Number(on(a, y)) - Number(on(a, x)) || countOf(a.slug, y.slug) - countOf(a.slug, x.slug))
     .map((v) => ({ attr: a.slug, ...v })))
   // two from each attribute in turn, then fill up

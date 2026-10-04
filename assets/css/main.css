@@ -4,6 +4,9 @@
 
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  /* big screens: everything is sized in rem, so growing the root size scales the whole page up instead of leaving
+     a narrow column in the middle (16px up to 1600px wide, then ~0.95vw, at most 24px on a 4K screen) */
+  @media (min-width: 1600px) { html { font-size: min(calc(16px + (100vw - 1600px) * 0.0085), 24px); } }
   body { @apply bg-cream text-ink font-sans antialiased; font-feature-settings: 'ss01'; }
   h1, h2, h3, .font-display { font-optical-sizing: auto; }
   ::selection { background: theme('colors.gold.light'); color: theme('colors.noir.950'); }

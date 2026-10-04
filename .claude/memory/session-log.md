@@ -105,3 +105,10 @@
 - Listing: `?category=` accepts a sub category slug (parent becomes the category); quick chips from live facet counts (attributes scoped to the category first, ≤6, values that narrow the results); option filters send `options=Size:M,Size:L&options=Colour:Navy`.
 - Copy neutralised (search, phone menu promo → New in, reviews reply uses shop name, combos "Combos & sets", brands "Brands & labels", gift box "gifts", stores/contact, return reasons). Cards: `comboLabel`, colour dots.
 - 2026-10-05: header nav needs xl width when the menu has more than 5 top-level entries (one per category); otherwise it ran into the centred logo.
+
+## 2026-10-05 — Hero carousel, split, big screens
+
+- `HomeHero` rebuilt for deals: picture/mobile picture (`<picture>`), wash by align/theme, badge + countdown, two buttons, picture-only slides, labelled tab strip with fill (below the picture on phones), swipe, arrow keys, pauses on hover/focus/hidden tab/reduced motion.
+- `HomeSplit`: picture in a rounded 4:5 frame (4:3 on phones) inside the container, `focus` + `image_left`.
+- Big screens: root font-size grows from 1600px wide (to 24px max), so rem layouts scale instead of leaving a narrow column.
+- Listing quick chips only offer values present on the listed products.
