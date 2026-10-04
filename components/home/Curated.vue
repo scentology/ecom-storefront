@@ -1,7 +1,9 @@
 <script setup>
-// One product at a time: an arched picture, its brand, name, a few lines, the price and sizes.
+// One product at a time: an arched portrait picture (bottles and apparel alike), its brand, name, a few lines,
+// the price and what it comes in (each option's values: "S, M, L · Navy, Black", or the variants).
 const props = defineProps({ section: { type: Object, required: true } })
-const sizes = (p) => (p.variants || []).map((v) => Object.values(v.attributes || {}).join(' ')).filter(Boolean).join(', ')
+const sizes = (p) => (p.options?.length ? p.options.map((o) => (o.values || []).join(', ')).filter(Boolean).join(' · ')
+  : (p.variants || []).map((v) => Object.values(v.attributes || {}).join(' ')).filter(Boolean).join(', '))
 </script>
 
 <template>
@@ -16,7 +18,7 @@ const sizes = (p) => (p.variants || []).map((v) => Object.values(v.attributes ||
               <NuxtLink :to="productUrl(p)" class="mx-auto w-full max-w-sm">
                 <span class="block rounded-t-full ring-1 ring-gold/40 p-2">
                   <span class="block aspect-[4/5] rounded-t-full overflow-hidden bg-white">
-                    <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-cover" loading="lazy">
+                    <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-cover object-top" loading="lazy">
                   </span>
                 </span>
               </NuxtLink>
@@ -24,9 +26,9 @@ const sizes = (p) => (p.variants || []).map((v) => Object.values(v.attributes ||
                 <p class="text-xs tracking-[0.2em] uppercase text-gold">{{ p.brand?.name || (p.is_combo ? 'Combo' : '') }}</p>
                 <h3 class="font-display text-4xl sm:text-5xl mt-3 leading-tight">{{ p.title }}</h3>
                 <p class="mt-5 text-cream/70 text-sm leading-relaxed line-clamp-3 max-w-md mx-auto">{{ p.description }}</p>
-                <p class="mt-6 tabular-nums"><span class="text-cream/60 text-sm mr-2">From</span><span class="text-2xl font-semibold">{{ money(priceOf(p).min) }}</span></p>
+                <p class="mt-6 tabular-nums"><span v-if="priceOf(p).max > priceOf(p).min" class="text-cream/60 text-sm mr-2">From</span><span class="text-2xl font-semibold">{{ money(priceOf(p).min) }}</span></p>
                 <p v-if="sizes(p)" class="text-xs text-cream/50 mt-1">Available in {{ sizes(p) }}</p>
-                <NuxtLink :to="productUrl(p)" class="s-btn-gold mt-7">View fragrance</NuxtLink>
+                <NuxtLink :to="productUrl(p)" class="s-btn-gold mt-7">View</NuxtLink>
               </div>
             </div>
           </template>

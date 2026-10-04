@@ -38,6 +38,8 @@ onMounted(() => {
   window.addEventListener('keydown', onKey)
   onBeforeUnmount(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('keydown', onKey) })
 })
+// many top-level entries (one per category) need the wider screens before they sit beside the logo
+const compact = computed(() => (items.value?.length || 0) > 5)
 </script>
 
 <template>
@@ -45,8 +47,8 @@ onMounted(() => {
     <div class="s-container h-16 sm:h-[4.5rem] grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
       <!-- left: the menu -->
       <nav class="flex items-center gap-1 min-w-0" aria-label="Main">
-        <button class="lg:hidden -ml-2 p-2" aria-label="Open menu" @click="menuOpen = true"><Icon name="lucide:menu" class="w-6 h-6" /></button>
-        <ul class="hidden lg:flex items-center gap-7 text-[0.9rem]">
+        <button class="-ml-2 p-2" :class="compact ? 'xl:hidden' : 'lg:hidden'" aria-label="Open menu" @click="menuOpen = true"><Icon name="lucide:menu" class="w-6 h-6" /></button>
+        <ul class="hidden items-center gap-5 xl:gap-7 text-[0.9rem] whitespace-nowrap" :class="compact ? 'xl:flex' : 'lg:flex'">
           <li v-for="(it, i) in items" :key="i" @mouseenter="it.columns?.length ? hoverOpen(i) : hoverClose()">
             <button
               v-if="it.columns?.length" class="relative inline-flex items-center gap-1 py-6 transition-colors hover:text-gold" :class="{ 'text-gold': openAt === i }"

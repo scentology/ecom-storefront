@@ -6,8 +6,8 @@ const components = {
   products: resolveComponent('HomeProducts'), cards: resolveComponent('HomeCards'), curated: resolveComponent('HomeCurated'), stats: resolveComponent('HomeStats'),
   testimonials: resolveComponent('HomeTestimonials'), faq: resolveComponent('HomeFaq'),
 }
-const { store } = useAppConfig()
-useSeoMeta({ ogTitle: store.name, description: store.description })
+const shop = useShop()
+useSeoMeta({ ogTitle: () => shop.value.name, description: () => shop.value.description })
 </script>
 
 <template>

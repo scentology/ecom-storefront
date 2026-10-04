@@ -17,7 +17,7 @@ const SOCIAL = { facebook: 'lucide:facebook', instagram: 'lucide:instagram', you
 
 <template>
   <div>
-    <UiPageHero eyebrow="We're here" title="Get in touch" note="Questions about a scent, an order or a gift? Ask us." />
+    <UiPageHero eyebrow="We're here" title="Get in touch" note="Questions about a product, a size, an order or a gift? Ask us." />
 
     <section class="s-container py-16">
       <h2 v-reveal class="s-title text-3xl text-noir-800 text-center">How can we help?</h2>
@@ -34,7 +34,7 @@ const SOCIAL = { facebook: 'lucide:facebook', instagram: 'lucide:instagram', you
         </a>
         <NuxtLink v-reveal="{ dir: 'up', delay: 160 }" to="/stores" class="rounded-2xl bg-white ring-1 ring-line p-6 hover:shadow-lift transition">
           <span class="w-11 h-11 rounded-full bg-noir-900 text-gold-light flex items-center justify-center"><Icon name="lucide:map-pin" class="w-5 h-5" /></span>
-          <p class="font-display text-xl text-noir-800 mt-4">Visit a store</p><p class="text-sm text-ink-soft mt-1">{{ stores.length }} {{ stores.length === 1 ? 'store' : 'stores' }}: try any fragrance</p>
+          <p class="font-display text-xl text-noir-800 mt-4">Visit a store</p><p class="text-sm text-ink-soft mt-1">{{ stores.length }} {{ stores.length === 1 ? 'store' : 'stores' }}: try before you buy</p>
         </NuxtLink>
         <div v-reveal="{ dir: 'up', delay: 240 }" class="rounded-2xl bg-white ring-1 ring-line p-6">
           <span class="w-11 h-11 rounded-full bg-noir-900 text-gold-light flex items-center justify-center"><Icon name="lucide:clock" class="w-5 h-5" /></span>
@@ -75,9 +75,9 @@ const SOCIAL = { facebook: 'lucide:facebook', instagram: 'lucide:instagram', you
 
     <section class="s-container pb-20">
       <div v-reveal="'zoom'" class="s-band rounded-3xl text-center px-6 py-14">
-        <h2 class="s-title text-3xl sm:text-4xl">Ready to discover <em class="font-display italic s-gold-text">your signature scent?</em></h2>
+        <h2 class="s-title text-3xl sm:text-4xl">Ready to find <em class="font-display italic s-gold-text">your signature look?</em></h2>
         <div class="flex flex-wrap justify-center gap-3 mt-8">
-          <NuxtLink to="/products" class="s-btn-gold">Shop fragrances</NuxtLink>
+          <NuxtLink to="/products" class="s-btn-gold">Shop now</NuxtLink>
           <NuxtLink to="/combos" class="s-btn border border-white/30 text-cream hover:border-gold hover:text-gold">See the combos</NuxtLink>
         </div>
       </div>

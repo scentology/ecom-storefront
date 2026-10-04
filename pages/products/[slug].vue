@@ -7,6 +7,7 @@ const p = product
 const cart = useCart()
 const saved = useWishlist()
 const { data: attributes } = await useAttributes()
+const { data: categories } = await useCategories()
 const active = ref(0)
 
 // variant selection: one value per option, starting from the first variant that can be sold online
@@ -19,13 +20,19 @@ const variant = computed(() => variants.value.find((v) => options.value.every((o
 const availableFor = (name) => (value) => variants.value.some((v) => v.online_stock > 0 && v.attributes?.[name] === value
   && options.value.every((o) => o.name === name || !picks[o.name] || v.attributes?.[o.name] === picks[o.name]))
 
-// the chosen size's own photo leads the gallery
+// the chosen variant's own photo leads the gallery; with a colour picked but no full match yet (or no photo on
+// the match), a variant of that colour lends its photo
+const looks = computed(() => options.value.filter((o) => o.type === 'colour' || o.type === 'image'))
+const lookVariant = computed(() => {
+  if (variant.value?.image || !looks.value.length) return variant.value
+  return variants.value.find((v) => v.image && looks.value.every((o) => !picks[o.name] || v.attributes?.[o.name] === picks[o.name])) || variant.value
+})
 const pics = computed(() => {
   const base = imagesOf(p.value)
-  const own = variant.value?.image
+  const own = lookVariant.value?.image
   return own ? [own, ...base.filter((x) => x !== own)] : base
 })
-watch(() => variant.value?._id, () => { active.value = 0 })
+watch(() => lookVariant.value?.image, () => { active.value = 0 })
 
 const inStock = computed(() => (variant.value?.online_stock || 0) > 0)
 const price = computed(() => (variant.value ? { min: variant.value.sale_price, was: variant.value.original_price > variant.value.sale_price ? variant.value.original_price : 0 } : priceOf(p.value)))
@@ -50,16 +57,17 @@ const addToBag = () => {
   }, qty.value)
 }
 
-// the fragrance profile
+// fragrance profile (notes, performance, when to wear) vs. a plain spec list for everything else
 const one = (attr) => valuesOf(attributes.value, p.value, attr)[0] || null
 const concentration = computed(() => one('concentration'))
-const facts = computed(() => [
-  { k: 'For', v: valuesOf(attributes.value, p.value, 'gender').map((x) => x.label).join(', '), to: (s) => `/products?f.gender=${s}`, slug: one('gender')?.slug },
-  { k: 'Concentration', v: concentration.value?.label, slug: concentration.value?.slug, to: (s) => `/products?f.concentration=${s}` },
-  { k: 'Type', v: one('style')?.label, slug: one('style')?.slug, to: (s) => `/products?f.style=${s}` },
-  { k: 'Family', v: valuesOf(attributes.value, p.value, 'family').map((x) => x.label).join(', ') },
-  { k: 'Edition', v: one('edition')?.label },
-].filter((f) => f.v))
+const fragrance = computed(() => isFragrance(p.value))
+// every visible attribute the product has values for (Fabric, Fit, Occasion, Work… or Concentration, Family…);
+// notes, season and occasion have their own blocks
+const OWN_BLOCKS = ['notes', 'season', 'occasion']
+const details = computed(() => [...attributes.value]
+  .filter((a) => a.visible && !OWN_BLOCKS.includes(a.slug) && p.value.facets?.[a.slug]?.length)
+  .sort((a, b) => (a.sort || 0) - (b.sort || 0))
+  .map((a) => ({ k: a.name, slug: a.slug, filterable: a.filterable, values: valuesOf(attributes.value, p.value, a.slug) })))
 const notes = computed(() => [
   { k: 'Top', hint: 'The first impression', list: p.value.notes?.top || [] },
   { k: 'Heart', hint: 'Once it settles', list: p.value.notes?.heart || [] },
@@ -69,19 +77,31 @@ const seasons = computed(() => valuesOf(attributes.value, p.value, 'season'))
 const allSeasons = computed(() => attributes.value.find((a) => a.slug === 'season')?.values || [])
 const occasions = computed(() => valuesOf(attributes.value, p.value, 'occasion'))
 const perf = computed(() => p.value.performance || {})
-const hasProfile = computed(() => facts.value.length || notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
+const hasProfile = computed(() => notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
+const hasAbout = computed(() => p.value.description || details.value.length || p.value.features?.length)
+
+// size guide: an option named Size + a chart on the sub category (else the category)
+const sizeChart = computed(() => sizeChartFor(p.value, categories.value))
+const isSize = (o) => /^size$/i.test((o.name || '').trim())
+const guideOpen = ref(false)
+const sizePick = computed(() => picks[options.value.find(isSize)?.name])
 const limited = computed(() => (p.value.facets?.edition || []).includes('limited'))
 
-const { data: related } = await useAsyncData(`related-${route.params.slug}`, async () => {
-  const family = p.value.facets?.family?.[0]
-  const query = family ? { 'f.family': family, limit: 9 } : { category_id: p.value.category_id, limit: 9 }
-  const res = await api('/products', { query })
-  return (res.data || []).filter((x) => x._id !== p.value._id && x.brand_id !== p.value.brand_id).slice(0, 4)
-}, { default: () => [] })
 const { data: fromBrand } = await useAsyncData(`brand-${route.params.slug}`, async () => {
   if (!p.value.brand) return []
   const res = await api('/products', { query: { brand: p.value.brand.slug, limit: 5 } })
   return (res.data || []).filter((x) => x._id !== p.value._id).slice(0, 4)
+}, { default: () => [] })
+// related: the same fragrance family, else the same sub category (else category); not what "More from" shows
+const family = p.value.facets?.family?.[0]
+const relatedTo = family ? `/products?f.family=${family}`
+  : p.value.sub_category?.slug ? `/products?category=${p.value.sub_category.slug}` : p.value.category?.slug ? `/products?category=${p.value.category.slug}` : '/products'
+const { data: related } = await useAsyncData(`related-${route.params.slug}`, async () => {
+  const query = family ? { 'f.family': family, limit: 12 }
+    : p.value.sub_category_id ? { sub_category_id: p.value.sub_category_id, limit: 12 } : { category_id: p.value.category_id, limit: 12 }
+  const res = await api('/products', { query })
+  const shown = new Set(fromBrand.value.map((x) => x._id))
+  return (res.data || []).filter((x) => x._id !== p.value._id && !shown.has(x._id) && (!family || x.brand_id !== p.value.brand_id)).slice(0, 4)
 }, { default: () => [] })
 
 const site = useRuntimeConfig().public.siteUrl
@@ -108,6 +128,7 @@ useHead({
     <nav class="s-container pt-6 text-xs text-ink-faint flex flex-wrap gap-1.5" aria-label="Breadcrumb">
       <NuxtLink to="/" class="hover:text-noir-800">Home</NuxtLink><span>/</span>
       <NuxtLink v-if="p.category" :to="`/products?category=${p.category.slug}`" class="hover:text-noir-800">{{ p.category.name }}</NuxtLink><span v-if="p.category">/</span>
+      <template v-if="p.sub_category?.slug"><NuxtLink :to="`/products?category=${p.sub_category.slug}`" class="hover:text-noir-800">{{ p.sub_category.name }}</NuxtLink><span>/</span></template>
       <span class="text-ink-soft">{{ p.title }}</span>
     </nav>
 
@@ -120,7 +141,7 @@ useHead({
       <!-- details -->
       <div>
         <p class="s-eyebrow text-ink-faint flex flex-wrap items-center gap-2">
-          <NuxtLink v-if="p.is_combo" to="/combos" class="text-gold-dark hover:text-noir-800">Combo · {{ variant?.bundle?.length || 0 }} scents</NuxtLink>
+          <NuxtLink v-if="p.is_combo" to="/combos" class="text-gold-dark hover:text-noir-800">{{ comboLabel(p, variant?.bundle?.length || 0) }}</NuxtLink>
           <NuxtLink v-else-if="p.brand" :to="`/products?brand=${p.brand.slug}`" class="hover:text-noir-800">{{ p.brand.name }}</NuxtLink>
           <span v-else-if="categoryLabel(p)">{{ categoryLabel(p) }}</span>
           <template v-if="concentration"><span class="text-gold">•</span><NuxtLink :to="`/products?f.concentration=${concentration.slug}`" class="hover:text-noir-800">{{ concentration.label }}</NuxtLink></template>
@@ -160,7 +181,7 @@ useHead({
         </div>
 
         <div class="mt-8 space-y-6">
-          <ProductOptionPicker v-for="o in options" :key="o.name" v-model="picks[o.name]" :option="o" :available="availableFor(o.name)" />
+          <ProductOptionPicker v-for="o in options" :key="o.name" v-model="picks[o.name]" :option="o" :available="availableFor(o.name)" :guide="!!sizeChart && isSize(o)" @guide="guideOpen = true" />
         </div>
 
         <p class="mt-6 text-sm flex items-center gap-2" :class="inStock ? 'text-green-700' : 'text-sale'">
@@ -197,38 +218,40 @@ useHead({
         <ul class="mt-8 grid grid-cols-2 gap-3 text-sm">
           <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:truck" class="w-5 h-5 text-noir-800 shrink-0" /> Delivery in 1–4 days</li>
           <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:banknote" class="w-5 h-5 text-noir-800 shrink-0" /> Cash on delivery</li>
-          <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:rotate-ccw" class="w-5 h-5 text-noir-800 shrink-0" /> 7 day returns</li>
-          <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:badge-check" class="w-5 h-5 text-noir-800 shrink-0" /> 100% authentic</li>
+          <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:rotate-ccw" class="w-5 h-5 text-noir-800 shrink-0" /> Easy 7 day returns</li>
+          <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:badge-check" class="w-5 h-5 text-noir-800 shrink-0" /> {{ fragrance ? '100% authentic' : 'Quality checked' }}</li>
         </ul>
 
-        <div v-if="(!hasProfile && p.description) || p.features?.length" class="mt-10 border-t border-line pt-8">
-          <h2 class="font-display text-2xl text-noir-800">Details</h2>
-          <p v-if="!hasProfile && p.description" class="mt-4 text-ink-soft leading-relaxed whitespace-pre-line">{{ p.description }}</p>
-          <ul v-if="p.features?.length" class="mt-4 space-y-2">
+      </div>
+    </section>
+
+    <!-- about: the description and features, beside a spec list of the product's attributes -->
+    <section v-if="hasAbout" class="s-container py-12 border-t border-line">
+      <div class="grid lg:grid-cols-[1fr_22rem] gap-10 lg:gap-16">
+        <div v-reveal="'left'">
+          <h2 class="s-title text-3xl text-noir-800">{{ fragrance ? 'About the fragrance' : 'About this piece' }}</h2>
+          <p v-if="p.description" class="mt-5 text-ink-soft leading-relaxed whitespace-pre-line max-w-2xl">{{ p.description }}</p>
+          <ul v-if="p.features?.length" class="mt-6 space-y-2 max-w-2xl">
             <li v-for="f in p.features" :key="f" class="flex gap-2 text-ink-soft"><Icon name="lucide:check" class="w-4 h-4 mt-1 text-gold-dark shrink-0" />{{ f }}</li>
           </ul>
+        </div>
+        <div v-if="details.length" v-reveal="'right'" class="self-start">
+          <h3 class="s-eyebrow text-gold-dark">Details</h3>
+          <dl class="mt-3 divide-y divide-line border-y border-line">
+            <div v-for="d in details" :key="d.slug" class="flex justify-between gap-6 py-3.5 text-sm">
+              <dt class="text-ink-faint">{{ d.k }}</dt>
+              <dd class="text-right font-semibold text-noir-800">
+                <template v-for="(v, i) in d.values" :key="v.slug"><template v-if="i">, </template><NuxtLink v-if="d.filterable" :to="`/products?f.${d.slug}=${v.slug}`" class="hover:underline">{{ v.label }}</NuxtLink><template v-else>{{ v.label }}</template></template>
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
     </section>
 
     <!-- fragrance profile -->
-    <section v-if="hasProfile" class="s-container py-12 border-t border-line">
-      <div class="grid lg:grid-cols-[1fr_22rem] gap-10 lg:gap-16">
-        <div v-reveal="'left'">
-          <h2 class="s-title text-3xl text-noir-800">About the fragrance</h2>
-          <p v-if="p.description" class="mt-5 text-ink-soft leading-relaxed whitespace-pre-line max-w-2xl">{{ p.description }}</p>
-        </div>
-        <dl v-if="facts.length" v-reveal="'right'" class="divide-y divide-line border-y border-line self-start">
-          <div v-for="f in facts" :key="f.k" class="flex justify-between gap-6 py-3.5 text-sm">
-            <dt class="text-ink-faint">{{ f.k }}</dt>
-            <dd class="text-right font-semibold text-noir-800">
-              <NuxtLink v-if="f.to && f.slug" :to="f.to(f.slug)" class="hover:underline">{{ f.v }}</NuxtLink><template v-else>{{ f.v }}</template>
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      <div v-if="notes.length" class="mt-14">
+    <section v-if="hasProfile" class="s-container py-12 border-t border-line space-y-14">
+      <div v-if="notes.length">
         <h2 class="s-title text-3xl text-noir-800">Notes</h2>
         <ol class="mt-6 grid sm:grid-cols-3 gap-4">
           <li v-for="(t, i) in notes" :key="t.k" v-reveal="{ dir: 'up', delay: i * 90 }" class="rounded-2xl bg-white ring-1 ring-line p-6">
@@ -243,7 +266,7 @@ useHead({
         </ol>
       </div>
 
-      <div v-if="perf.longevity || perf.projection || seasons.length || occasions.length" class="mt-14 grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <div v-if="perf.longevity || perf.projection || seasons.length || occasions.length" class="grid lg:grid-cols-2 gap-10 lg:gap-16">
         <div v-if="perf.longevity || perf.projection" v-reveal="'left'">
           <h2 class="s-title text-3xl text-noir-800">Performance</h2>
           <div v-for="m in [{ k: 'Longevity', v: perf.longevity, max: 5, scale: LONGEVITY }, { k: 'Projection', v: perf.projection, max: 4, scale: PROJECTION }].filter((x) => x.v)" :key="m.k" class="mt-6">
@@ -279,9 +302,11 @@ useHead({
     </section>
 
     <section v-if="related.length" class="s-container py-16">
-      <UiSectionHeading eyebrow="You may also like" title="Smells a bit" highlight="like this" :to="p.facets?.family?.[0] ? `/products?f.family=${p.facets.family[0]}` : '/products'" />
+      <UiSectionHeading v-if="fragrance && family" eyebrow="You may also like" title="Smells a bit" highlight="like this" :to="relatedTo" />
+      <UiSectionHeading v-else eyebrow="You may also like" :title="categoryLabel(p) ? 'More in' : 'More to'" :highlight="categoryLabel(p) || 'discover'" :to="relatedTo" />
       <ProductGrid class="mt-10" :products="related" />
     </section>
+    <ProductSizeGuide v-model="guideOpen" :chart="sizeChart" :title="categoryLabel(p) ? `${categoryLabel(p)} sizes` : p.title" :current="sizePick" />
     <!-- phones: buy bar -->
     <Transition enter-from-class="translate-y-full" enter-active-class="transition duration-300" leave-to-class="translate-y-full" leave-active-class="transition duration-200">
       <div v-if="stickyBuy" class="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-noir-900 text-cream px-4 py-3 flex items-center gap-3 shadow-lift">

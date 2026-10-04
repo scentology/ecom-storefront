@@ -25,9 +25,9 @@ const dropdowns = computed(() => props.menu.items || [])
               <Transition mode="out-in" enter-from-class="opacity-0 translate-x-6" enter-active-class="transition duration-200" leave-to-class="opacity-0 -translate-x-6" leave-active-class="transition duration-150">
                 <!-- top level -->
                 <div v-if="!level" key="root" class="p-5">
-                  <NuxtLink to="/pages/decants" class="flex items-center gap-3 rounded-2xl bg-gold/15 ring-1 ring-gold/30 px-4 py-3.5 mb-6" @click="emit('close')">
+                  <NuxtLink to="/products?sort=new" class="flex items-center gap-3 rounded-2xl bg-gold/15 ring-1 ring-gold/30 px-4 py-3.5 mb-6" @click="emit('close')">
                     <span class="w-9 h-9 rounded-full bg-noir-900 text-gold-light flex items-center justify-center"><Icon name="lucide:sparkles" class="w-4 h-4" /></span>
-                    <span class="flex-1 font-semibold text-noir-800">New to decants? Start here</span>
+                    <span class="flex-1 font-semibold text-noir-800">New in: see what just landed</span>
                     <Icon name="lucide:chevron-right" class="w-5 h-5 text-noir-800" />
                   </NuxtLink>
                   <ul class="divide-y divide-line">

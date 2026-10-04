@@ -85,3 +85,25 @@ export function useFooterPages() {
 
 /** Fetch the shop details before anything renders (app.vue awaits it), so server and browser agree. */
 export const loadShop = () => useAsyncData('shop', async () => (await api('/storefront/info').catch(() => ({}))).data || {}, { default: () => ({}) })
+
+/** Whether a product is a fragrance: it has a notes pyramid, performance, or fragrance-only facets. */
+export const isFragrance = (p) => {
+  const n = p?.notes || {}
+  if ((n.top?.length || n.heart?.length || n.base?.length) || p?.performance?.longevity || p?.performance?.projection) return true
+  if (['notes', 'concentration', 'family'].some((a) => p?.facets?.[a]?.length)) return true
+  return /fragrance|perfume|attar/i.test(`${p?.category?.slug || ''} ${p?.sub_category?.slug || ''}`)
+}
+
+/** "Combo · 3 scents" for fragrance combos, "Combo · 3 items" for everything else. */
+export const comboLabel = (p, n) => `Combo · ${n} ${isFragrance(p) ? (n === 1 ? 'scent' : 'scents') : (n === 1 ? 'item' : 'items')}`
+
+/** The size chart a product uses: its sub category's, else its category's (from the product or the category tree). */
+export const sizeChartFor = (p, categories = []) => {
+  const ok = (c) => (c?.size_chart?.rows?.length && c.size_chart.columns?.length ? c.size_chart : null)
+  const top = categories.find((c) => c._id === p?.category_id)
+  const sub = top?.children?.find((s) => s._id === p?.sub_category_id) || categories.flatMap((c) => c.children || []).find((s) => s._id === p?.sub_category_id)
+  return ok(p?.sub_category) || ok(sub) || ok(p?.category) || ok(top)
+}
+
+/** Whether an attribute applies to any of these category ids (no scope = every category). */
+export const attributeApplies = (a, ids = []) => !a?.category_ids?.length || ids.some((id) => id && a.category_ids.includes(id))

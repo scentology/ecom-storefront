@@ -3,6 +3,11 @@
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close'])
 const { data: brands } = await useBrands()
+const { data: categories } = await useCategories()
+// "Try" suggestions: the sub categories first (Panjabi, Suits…), then a mix of occasions, notes and brands
+const TRY = ['Panjabi', 'Eid', 'Suits', 'Oud', 'Linen', 'Dior']
+const suggestions = computed(() => [...categories.value.flatMap((c) => c.children.map((s) => s.name)), ...TRY]
+  .filter((v, i, a) => a.findIndex((x) => x.toLowerCase() === v.toLowerCase()) === i).slice(0, 6))
 useScrollLock(computed(() => props.open))
 const q = ref('')
 const input = ref(null)
@@ -69,7 +74,7 @@ const range = (p) => {
             <form class="relative" role="search" @submit.prevent="submit">
               <Icon name="lucide:search" class="w-5 h-5 text-gold absolute left-5 top-1/2 -translate-y-1/2" />
               <input
-                ref="input" v-model="q" type="search" autocomplete="off" placeholder="Search a fragrance, brand or note…" aria-label="Search"
+                ref="input" v-model="q" type="search" autocomplete="off" placeholder="Search panjabi, suits, fragrances, brands…" aria-label="Search"
                 class="w-full rounded-full bg-noir-900 text-cream placeholder:text-cream/45 ring-1 ring-gold/40 focus:ring-2 focus:ring-gold pl-14 pr-14 py-4 text-lg outline-none"
                 @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)" @keydown.esc="emit('close')"
               >
@@ -95,7 +100,7 @@ const range = (p) => {
                     </NuxtLink>
                   </li>
                 </ul>
-                <p v-else-if="!loading" class="px-5 pb-5 text-sm text-ink-soft">Nothing matches “{{ q.trim() }}”. Try a brand, a note like oud, or a season.</p>
+                <p v-else-if="!loading" class="px-5 pb-5 text-sm text-ink-soft">Nothing matches “{{ q.trim() }}”. Try a brand, a category, a fabric or a note like oud.</p>
                 <button v-if="total > results.length" class="w-full border-t border-line px-5 py-3.5 text-sm font-semibold text-noir-800 hover:bg-cream-deep/60 flex items-center justify-center gap-2" @click="submit">See all {{ total }} results <Icon name="lucide:arrow-right" class="w-4 h-4" /></button>
               </template>
               <div v-else class="px-5 py-5">
@@ -107,7 +112,7 @@ const range = (p) => {
                 </template>
                 <p class="text-[0.68rem] tracking-[0.2em] uppercase text-ink-faint mb-3">Try</p>
                 <div class="flex flex-wrap gap-2">
-                  <button v-for="t in ['Oud', 'Vanilla', 'Dior', 'Summer', 'Lattafa', 'Rose']" :key="t" class="rounded-full border border-line-strong px-3 py-1 text-sm hover:bg-noir-900 hover:text-gold-light transition" @click="q = t">{{ t }}</button>
+                  <button v-for="t in suggestions" :key="t" class="rounded-full border border-line-strong px-3 py-1 text-sm hover:bg-noir-900 hover:text-gold-light transition" @click="q = t">{{ t }}</button>
                 </div>
               </div>
             </div>

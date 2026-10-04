@@ -169,7 +169,7 @@ const place = async () => {
     <template #fallback><p class="py-20 text-center text-ink-soft">Loading your bag…</p></template>
     <div v-if="!cart.lines.value.length" class="py-20 text-center">
       <p class="font-display text-2xl">Your bag is empty</p>
-      <NuxtLink to="/products" class="s-btn-dark mt-6">Explore fragrances</NuxtLink>
+      <NuxtLink to="/products" class="s-btn-dark mt-6">Start shopping</NuxtLink>
     </div>
 
     <div v-else class="mt-10 grid lg:grid-cols-[1fr_24rem] gap-10 items-start">

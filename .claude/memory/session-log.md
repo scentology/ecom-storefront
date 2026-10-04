@@ -97,3 +97,11 @@
 - 2026-09-30: customer sign-in is by **email code** now (was phone SMS): `/auth/otp/request|verify` take `email`; code sent with the mailer (Orb in prod). Staff emails are refused there. Customers found/created by email; phone comes from the delivery address (or the pickup phone field on the storefront).
 
 - 2026-10-05: cart ownership / POS email / customer merge changed nothing here. `POST /orders` now needs the cart to belong to the signed-in customer: checkout already creates/updates its cart with the token, so keep it that way.
+
+## 2026-10-05 — Multi-category (fragrances + menswear)
+
+- Identity from `/storefront/info` (`useShop()`): Logo (monogram ring, no atomiser), app.vue title/meta, home/listing meta. app.config keeps only fallback store details + neutral announcements (dead hero/promises/faq removed).
+- Product page: "Details" spec list from every visible attribute with values (notes/season/occasion excluded), fragrance profile only when `isFragrance`/profile data, "About this piece" vs "About the fragrance", related by family else sub category (deduped against "More from"), colour pick swaps to that colour's variant photo even before the size matches, portrait 4:5 gallery (object-contain on cream), `ProductSizeGuide` drawer when an option is named Size and the sub category (else category) has `size_chart` rows.
+- Listing: `?category=` accepts a sub category slug (parent becomes the category); quick chips from live facet counts (attributes scoped to the category first, ≤6, values that narrow the results); option filters send `options=Size:M,Size:L&options=Colour:Navy`.
+- Copy neutralised (search, phone menu promo → New in, reviews reply uses shop name, combos "Combos & sets", brands "Brands & labels", gift box "gifts", stores/contact, return reasons). Cards: `comboLabel`, colour dots.
+- 2026-10-05: header nav needs xl width when the menu has more than 5 top-level entries (one per category); otherwise it ran into the centred logo.

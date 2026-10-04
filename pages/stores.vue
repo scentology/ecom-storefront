@@ -1,6 +1,6 @@
 <script setup>
 // Store finder: every store with hours, phone and directions; nearest first once the shopper shares a location.
-useSeoMeta({ title: 'Our stores', description: 'Visit us, try a fragrance, or collect your online order.' })
+useSeoMeta({ title: 'Our stores', description: 'Visit us, try before you buy, or collect your online order.' })
 const { data } = await useAsyncData('stores', () => api('/stores').then((r) => r.data || []).catch(() => []))
 const stores = computed(() => data.value || [])
 const here = ref(null)
@@ -25,7 +25,7 @@ const localPhone = (p) => (p && p.startsWith('880') ? `0${p.slice(3)}` : p || ''
   <section class="s-container py-14">
     <p class="s-eyebrow text-gold-deep text-center">Visit us</p>
     <h1 class="s-title text-4xl sm:text-5xl text-noir-900 text-center mt-3">Our stores</h1>
-    <p class="text-ink-soft text-center mt-3 max-w-xl mx-auto">Try any fragrance before you buy, or order online and collect it from the store that suits you.</p>
+    <p class="text-ink-soft text-center mt-3 max-w-xl mx-auto">Try before you buy, from fragrances to fittings, or order online and collect it from the store that suits you.</p>
     <div class="text-center mt-6">
       <button class="s-btn-line" :disabled="locating" @click="locate"><Icon name="lucide:locate-fixed" class="w-4 h-4" /> {{ locating ? 'Finding you…' : 'Nearest to me' }}</button>
       <p v-if="locError" class="text-sm text-sale mt-2">{{ locError }}</p>

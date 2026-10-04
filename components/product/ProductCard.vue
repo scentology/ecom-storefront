@@ -1,10 +1,15 @@
 <script setup>
-// Grid card: image (second image on hover), category eyebrow, title, price; heart saves it.
+// Grid card: image (second image on hover), brand/category eyebrow, title, colour dots, price; heart saves it.
 const props = defineProps({ product: { type: Object, required: true }, eager: Boolean })
 const saved = useWishlist()
 const price = computed(() => priceOf(props.product))
 const off = computed(() => discountOf(props.product))
 const pics = computed(() => imagesOf(props.product))
+// colour swatches under the title (first colour option, up to 5)
+const colours = computed(() => {
+  const o = (props.product.options || []).find((x) => x.type === 'colour' && x.values?.length > 1)
+  return o ? o.values.map((v) => ({ name: v, hex: o.swatches?.[v] || '#ddd' })) : []
+})
 const soldOut = computed(() => (props.product.variants || []).length > 0 && onlineStockOf(props.product) <= 0)
 </script>
 
@@ -25,10 +30,14 @@ const soldOut = computed(() => (props.product.variants || []).length > 0 && onli
         </div>
       </div>
       <div class="pt-4 text-center px-2">
-        <p v-if="product.is_combo" class="s-eyebrow text-gold-dark">Combo · {{ product.variants?.[0]?.bundle?.length || 0 }} scents</p>
+        <p v-if="product.is_combo" class="s-eyebrow text-gold-dark">{{ comboLabel(product, product.variants?.[0]?.bundle?.length || 0) }}</p>
         <p v-else-if="eyebrowOf(product)" class="s-eyebrow text-ink-faint">{{ eyebrowOf(product) }}</p>
         <h3 class="mt-1.5 leading-snug text-[0.98rem] group-hover:text-noir-800">{{ product.title }}</h3>
         <p v-if="product.rating?.count" class="mt-1 flex items-center justify-center gap-1.5 text-xs text-ink-faint"><ProductStars :value="product.rating.average" size="w-3 h-3" /> {{ product.rating.count }}</p>
+        <p v-if="colours.length" class="mt-2 flex items-center justify-center gap-1.5" :aria-label="`${colours.length} colours`">
+          <span v-for="c in colours.slice(0, 5)" :key="c.name" class="w-3 h-3 rounded-full ring-1 ring-black/15" :style="{ background: c.hex }" :title="c.name" />
+          <span v-if="colours.length > 5" class="text-[0.68rem] text-ink-faint">+{{ colours.length - 5 }}</span>
+        </p>
         <p class="mt-1.5 text-sm tabular-nums">
           <span v-if="price.max > price.min" class="text-ink-faint">From </span>
           <span class="font-semibold text-noir-800">{{ money(price.min) }}</span>

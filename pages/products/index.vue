@@ -1,6 +1,6 @@
 <script setup>
-// Listing: category / sub category, search, price range, offers, brands, attributes (gender, concentration,
-// season, notes… with live counts), option filters (from the category), sort.
+// Listing: category / sub category, search, price range, offers, brands, attributes (fabric, fit, concentration,
+// notes… with live counts), option filters (from the category), sort.
 const route = useRoute()
 const router = useRouter()
 const { data: categories } = await useCategories()
@@ -20,8 +20,12 @@ const BUDGETS = [[0, 500], [500, 1000], [1000, 2000], [2000, 5000], [5000, null]
 const PAGE = 24
 
 const q = computed(() => route.query)
-const category = computed(() => categories.value.find((c) => c.slug === q.value.category) || null)
-const sub = computed(() => category.value?.children.find((s) => s.slug === q.value.sub) || null)
+// ?category= takes a top-level slug or a sub category slug (menu/home links use it for both: ?category=panjabi);
+// a sub category slug picks its parent as the category. ?category=men&sub=panjabi works too.
+const category = computed(() => categories.value.find((c) => c.slug === q.value.category)
+  || categories.value.find((c) => c.children.some((s) => s.slug === q.value.category)) || null)
+const sub = computed(() => category.value?.children.find((s) => s.slug === q.value.sub)
+  || category.value?.children.find((s) => s.slug === q.value.category) || null)
 const optionFilters = computed(() => ((sub.value?.filters?.length ? sub.value : category.value)?.filters || []).filter((f) => f.filter_type === 'options' && f.values?.length))
 // ?opt.Binding=Hardcover,Paperback
 const selectedOptions = computed(() => Object.fromEntries(Object.entries(q.value)
@@ -37,7 +41,8 @@ const apiQuery = computed(() => ({
   page: page.value, limit: PAGE, sort_by: SORTS[sort.value].api,
   category_id: category.value?._id, sub_category_id: sub.value?._id, q: q.value.q,
   min_price: q.value.min, max_price: q.value.max, on_sale: q.value.on_sale === 'true' ? true : undefined,
-  options: Object.values(selectedOptions.value).filter((vs) => vs.length).map((vs) => vs.join(',')),
+  // one param per option (ANDed), values named within it (ORed): options=Size:M,Size:L&options=Colour:Navy
+  options: Object.entries(selectedOptions.value).filter(([, vs]) => vs.length).map(([g, vs]) => vs.map((v) => `${g}:${v}`).join(',')),
   brand: selectedBrands.value.join(',') || undefined,
   featured: q.value.featured === 'true' ? true : undefined,
   ...Object.fromEntries(Object.entries(selectedFacets.value).filter(([, vs]) => vs.length).map(([k, vs]) => [`f.${k}`, vs.join(',')])),
@@ -81,10 +86,28 @@ const chosen = computed(() => [
   ...selectedBrands.value.map((b) => ({ key: `b-${b}`, label: brands.value.find((x) => x.slug === b)?.name || b, off: () => toggleBrand(b) })),
   ...Object.entries(selectedFacets.value).flatMap(([a, vs]) => vs.map((v) => ({ key: `f-${a}-${v}`, label: valueLabel(attributes.value, a, v), off: () => toggleFacet(a, v) }))),
 ])
-// quick picks above the grid: the styles, two seasons, two occasions
+// quick picks above the grid: the most useful values of the filterable attributes for this category, from the
+// live counts (values in the current results, not every product alike), at most 6; chosen ones always stay
+const QUICK = 6
+const scopeIds = computed(() => (sub.value ? [sub.value._id, category.value._id] : category.value ? [category.value._id, ...category.value.children.map((c) => c._id)] : []))
 const quick = computed(() => {
-  const pick = (attr, only) => (attributes.value.find((a) => a.slug === attr)?.values || []).filter((v) => !only || only.includes(v.slug)).map((v) => ({ attr, ...v }))
-  return [...pick('style'), ...pick('season', ['summer', 'winter']), ...pick('occasion', ['office', 'date-night'])]
+  const ids = scopeIds.value
+  const attrs = attributes.value
+    .filter((a) => a.filterable && a.values.length <= 12 && (!ids.length || attributeApplies(a, ids)))
+    // attributes made for this category first, then the admin's order
+    .sort((a, b) => (ids.length ? (b.category_ids?.length ? 1 : 0) - (a.category_ids?.length ? 1 : 0) : 0) || (a.sort || 0) - (b.sort || 0))
+  const on = (a, v) => !!selectedFacets.value[a.slug]?.includes(v.slug)
+  const lists = attrs.map((a) => a.values
+    .filter((v) => on(a, v) || (countOf(a.slug, v.slug) > 0 && countOf(a.slug, v.slug) < total.value))
+    .sort((x, y) => Number(on(a, y)) - Number(on(a, x)) || countOf(a.slug, y.slug) - countOf(a.slug, x.slug))
+    .map((v) => ({ attr: a.slug, ...v })))
+  // two from each attribute in turn, then fill up
+  const out = []
+  for (const take of [2, Infinity]) {
+    for (const list of lists) for (const v of list.slice(0, take)) if (out.length < QUICK && !out.includes(v)) out.push(v)
+  }
+  const chosenOff = lists.flat().filter((v) => selectedFacets.value[v.attr]?.includes(v.slug) && !out.includes(v))
+  return [...out, ...chosenOff]
 })
 // price slider bounds: up to the dearest product, rounded up
 const priceTop = computed(() => Math.max(1000, Math.ceil((counts.value?.max_price || 10000) / 1000) * 1000))
@@ -128,8 +151,8 @@ const single = computed(() => {
   return chosen.value.map((c) => c.label).join(' · ')
 })
 const heading = computed(() => (q.value.q ? `Results for “${q.value.q}”` : single.value || sub.value?.name || category.value?.name || (q.value.on_sale ? 'Offers' : q.value.featured ? 'Featured' : 'The collection')))
-const { store } = useAppConfig()
-useSeoMeta({ title: () => heading.value.replace(/[“”]/g, ''), description: () => category.value?.description || store.description })
+const shop = useShop()
+useSeoMeta({ title: () => heading.value.replace(/[“”]/g, ''), description: () => category.value?.description || shop.value.description })
 </script>
 
 <template>
@@ -144,13 +167,13 @@ useSeoMeta({ title: () => heading.value.replace(/[“”]/g, ''), description: (
           <button v-for="c in categories" :key="c._id" class="s-chip shrink-0" :class="{ 's-chip-on': category?._id === c._id && !sub }" @click="set({ category: c.slug, sub: undefined })">{{ c.name }}</button>
           <span class="w-px bg-line-strong mx-1 shrink-0" />
         </template>
+        <template v-if="category?.children?.length">
+          <button v-for="sc in category.children" :key="sc._id" class="s-chip shrink-0" :class="{ 's-chip-on': sub?._id === sc._id }" :aria-pressed="sub?._id === sc._id" @click="set({ category: category.slug, sub: sub?._id === sc._id ? undefined : sc.slug })">{{ sc.name }}</button>
+          <span v-if="quick.length" class="w-px bg-line-strong mx-1 shrink-0" />
+        </template>
         <button v-for="c in quick" :key="`${c.attr}-${c.slug}`" class="s-chip shrink-0" :class="{ 's-chip-on': selectedFacets[c.attr]?.includes(c.slug) }" :aria-pressed="!!selectedFacets[c.attr]?.includes(c.slug)" @click="toggleFacet(c.attr, c.slug)">
           <Icon v-if="c.icon" :name="c.icon" class="w-4 h-4" />{{ c.label }}
         </button>
-        <template v-if="category?.children?.length">
-          <span class="w-px bg-line-strong mx-1 shrink-0" />
-          <button v-for="sc in category.children" :key="sc._id" class="s-chip shrink-0" :class="{ 's-chip-on': sub?._id === sc._id }" @click="set({ sub: sc.slug })">{{ sc.name }}</button>
-        </template>
       </div>
     </div>
 

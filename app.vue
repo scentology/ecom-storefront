@@ -1,11 +1,11 @@
 <script setup>
 await loadShop()
-const { store } = useAppConfig()
+const shop = useShop()
 useHead({
-  titleTemplate: (t) => (t ? `${t} · ${store.name}` : `${store.name} · ${store.tagline}`),
-  meta: [{ name: 'description', content: store.description }],
+  titleTemplate: (t) => (t ? `${t} · ${shop.value.name}` : `${shop.value.name} · ${shop.value.tagline}`),
+  meta: [{ name: 'description', content: () => shop.value.description }],
 })
-useSeoMeta({ ogSiteName: store.name, ogType: 'website' })
+useSeoMeta({ ogSiteName: () => shop.value.name, ogType: 'website' })
 </script>
 <template>
   <NuxtLayout><NuxtPage /></NuxtLayout>

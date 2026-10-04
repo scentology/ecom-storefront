@@ -1,18 +1,23 @@
 <script setup>
 // One option of a product: text buttons, colour swatches or image swatches. Values no variant can sell
-// with the other picks are struck through.
-const props = defineProps({ option: { type: Object, required: true }, modelValue: String, available: { type: Function, default: () => true } })
-const emit = defineEmits(['update:modelValue'])
+// with the other picks are struck through. `guide` shows a "Size guide" link beside the legend.
+const props = defineProps({ option: { type: Object, required: true }, modelValue: String, available: { type: Function, default: () => true }, guide: Boolean })
+const emit = defineEmits(['update:modelValue', 'guide'])
 const type = computed(() => props.option.type || 'text')
 </script>
 <template>
   <fieldset>
-    <legend class="text-sm mb-3"><span class="font-semibold">{{ option.name }}</span><span v-if="modelValue" class="text-ink-soft">: {{ modelValue }}</span></legend>
+    <legend class="w-full flex items-baseline justify-between gap-4 mb-3 text-sm">
+      <span><span class="font-semibold">{{ option.name }}</span><span v-if="modelValue" class="text-ink-soft">: {{ modelValue }}</span></span>
+      <button v-if="guide" type="button" class="inline-flex items-center gap-1.5 text-xs font-semibold text-noir-800 underline underline-offset-4 decoration-gold hover:text-gold-dark" @click="emit('guide')">
+        <Icon name="lucide:ruler" class="w-3.5 h-3.5" /> Size guide
+      </button>
+    </legend>
     <div class="flex flex-wrap gap-2.5">
       <button
         v-for="v in option.values" :key="v" type="button" :aria-pressed="modelValue === v" :title="v"
         :class="[
-          type === 'text' ? 'px-5 py-2.5 rounded-full border text-sm' : 'p-1 rounded-full border-2',
+          type === 'text' ? 'min-w-[3rem] px-5 py-2.5 rounded-full border text-sm' : 'p-1 rounded-full border-2',
           modelValue === v ? (type === 'text' ? 'border-noir-800 bg-noir-800 text-cream' : 'border-noir-800') : 'border-line-strong hover:border-noir-800',
           !available(v) && 'opacity-40 line-through',
         ]"

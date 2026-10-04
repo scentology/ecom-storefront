@@ -3,6 +3,7 @@
 // who received it.
 const props = defineProps({ productId: { type: String, required: true } })
 const auth = useAuth()
+const shop = useShop()
 const { show } = useToast()
 const PAGE = 5
 const page = ref(1)
@@ -63,7 +64,7 @@ const submit = async () => {
             </li>
           </ul>
         </template>
-        <p v-else class="text-ink-soft text-sm">No reviews yet. Be the first to share your thoughts on this fragrance.</p>
+        <p v-else class="text-ink-soft text-sm">No reviews yet. Be the first to share your thoughts.</p>
       </div>
 
       <div>
@@ -79,7 +80,7 @@ const submit = async () => {
                 </button>
               </div>
               <input v-model="form.title" class="s-input mt-4" maxlength="120" placeholder="A title (optional)" aria-label="Title">
-              <textarea v-model="form.body" rows="4" class="s-input mt-3" maxlength="2000" placeholder="How does it smell, last, fit you?" aria-label="Your review" required />
+              <textarea v-model="form.body" rows="4" class="s-input mt-3" maxlength="2000" placeholder="What did you think? Quality, fit, how it wears…" aria-label="Your review" required />
               <div class="flex items-center gap-3 mt-4">
                 <button class="s-btn-dark" :disabled="busy">{{ busy ? 'Sending…' : 'Send review' }}</button>
                 <button type="button" class="text-sm text-ink-soft hover:text-noir-800" @click="open = false">Cancel</button>
@@ -101,7 +102,7 @@ const submit = async () => {
             <p v-if="r.title" class="mt-3 font-semibold text-noir-800">{{ r.title }}</p>
             <p class="mt-1.5 text-ink-soft leading-relaxed whitespace-pre-line">{{ r.body }}</p>
             <div v-if="r.reply" class="mt-4 rounded-xl bg-cream-deep/70 px-4 py-3 text-sm">
-              <p class="text-xs font-semibold text-noir-800">Scentology replied</p>
+              <p class="text-xs font-semibold text-noir-800">{{ shop.name }} replied</p>
               <p class="text-ink-soft mt-1">{{ r.reply }}</p>
             </div>
           </li>

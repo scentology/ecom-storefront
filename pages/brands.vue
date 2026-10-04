@@ -10,12 +10,12 @@ const list = computed(() => brands.value
   .sort((a, b) => a.name.localeCompare(b.name)))
 const letters = computed(() => [...new Set(brands.value.filter((b) => b.products > 0).map((b) => b.name[0].toUpperCase()))].sort())
 const featured = computed(() => brands.value.filter((b) => b.featured && b.products > 0))
-useSeoMeta({ title: 'Brands', description: 'The fragrance houses we carry, from designer icons to niche and Arabian perfumers.' })
+useSeoMeta({ title: 'Brands', description: 'The brands and labels we carry, from fragrance houses to our own menswear.' })
 </script>
 
 <template>
   <div>
-    <UiPageHero eyebrow="The houses" title="Luxury fragrance brands" :note="`${brands.filter((b) => b.products > 0).length} houses, each with a legacy of its own`" />
+    <UiPageHero eyebrow="The houses" title="Brands & labels" :note="`${brands.filter((b) => b.products > 0).length} brands and labels, each with a story of its own`" />
 
     <div class="s-container py-12">
       <div v-if="featured.length" class="mb-12">
@@ -40,7 +40,7 @@ useSeoMeta({ title: 'Brands', description: 'The fragrance houses we carry, from 
             <span v-else class="font-display text-2xl text-noir-800">{{ b.name }}</span>
           </div>
           <div class="px-5 py-4 flex items-center justify-between gap-3">
-            <span><span class="block font-display text-lg text-noir-800">{{ b.name }}</span><span class="block text-xs text-ink-faint">{{ b.products }} {{ b.products === 1 ? 'fragrance' : 'fragrances' }}</span></span>
+            <span><span class="block font-display text-lg text-noir-800">{{ b.name }}</span><span class="block text-xs text-ink-faint">{{ b.products }} {{ b.products === 1 ? 'product' : 'products' }}</span></span>
             <Icon name="lucide:arrow-right" class="w-4 h-4 text-ink-faint transition group-hover:translate-x-1 group-hover:text-noir-800" />
           </div>
         </NuxtLink>

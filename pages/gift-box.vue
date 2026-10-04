@@ -1,5 +1,5 @@
 <script setup>
-// Gift box builder: 1 pick up to N fragrances (any size), 2 write the card, 3 add the lot (with the box) to the
+// Gift box builder: 1 pick up to N items (any size or variant), 2 write the card, 3 add the lot (with the box) to the
 // bag and check out. The box itself is the shop's gift box product; its settings live in the shop details.
 const shop = useShop()
 const cart = useCart()
@@ -14,7 +14,7 @@ const boxVariant = computed(() => box.value?._id && box.value.variants?.find((v)
 const step = ref(1)
 const picks = ref([]) // { product, variant }
 
-// the fragrances to choose from: searchable, by brand, paged
+// the items to choose from: searchable, by brand, paged
 const { data: brands } = await useBrands()
 const q = ref('')
 const brand = ref('')
@@ -54,7 +54,7 @@ const finish = () => {
   cart.giftMessage.value = message.value
   navigateTo('/checkout')
 }
-useSeoMeta({ title: 'Create a gift box', description: 'Choose the fragrances, write a card, and we wrap it in our gift box.' })
+useSeoMeta({ title: 'Create a gift box', description: 'Choose the gifts, write a card, and we wrap it in our gift box.' })
 const STEPS = ['Select', 'Personalise', 'Checkout']
 </script>
 
@@ -66,7 +66,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
       <div class="relative s-container py-20 sm:py-28 text-center">
         <h1 class="s-title text-5xl sm:text-7xl animate-rise">The art of <em class="font-display italic s-gold-text block">gifting luxury</em></h1>
         <span class="s-rule mx-auto mt-6 animate-rise [animation-delay:120ms]" />
-        <p class="mt-6 text-cream/80 max-w-xl mx-auto animate-rise [animation-delay:200ms]">Choose the fragrances, write a card, and we wrap it all in our gift box.</p>
+        <p class="mt-6 text-cream/80 max-w-xl mx-auto animate-rise [animation-delay:200ms]">Choose the gifts, a fragrance, a panjabi or both, write a card, and we wrap it all in our gift box.</p>
         <ol class="flex items-center justify-center gap-4 sm:gap-8 mt-10" aria-label="Steps">
           <li v-for="(s, i) in STEPS" :key="s" class="flex items-center gap-3">
             <button class="flex flex-col items-center gap-2" :disabled="i + 1 > step && !(i === 1 && picks.length) " @click="i + 1 <= step || picks.length ? (step = i + 1) : null">
@@ -84,7 +84,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
         <!-- 1: select -->
         <div v-if="step === 1">
           <div class="rounded-2xl bg-white ring-1 ring-line p-6">
-            <h2 class="font-display text-3xl text-noir-800">Select fragrances</h2>
+            <h2 class="font-display text-3xl text-noir-800">Select gifts</h2>
             <p class="text-ink-soft text-sm mt-1">Choose up to {{ max }} for your gift box, in the size you like.</p>
             <div class="flex flex-col sm:flex-row gap-3 mt-5">
               <input v-model="q" class="s-input" placeholder="Search by name or note" aria-label="Search">
@@ -101,7 +101,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
                   <p class="text-sm tabular-nums mt-1">{{ money(variantOf(p)?.sale_price) }}</p>
                 </div>
               </div>
-              <select v-if="(p.variants || []).length > 1" v-model="sizeOf[p._id]" class="s-input !py-2 !text-sm mt-3" :aria-label="`Size of ${p.title}`" :disabled="inBox(p)">
+              <select v-if="(p.variants || []).length > 1" v-model="sizeOf[p._id]" class="s-input !py-2 !text-sm mt-3" :aria-label="`Option for ${p.title}`" :disabled="inBox(p)">
                 <option v-for="v in p.variants" :key="v._id" :value="v._id" :disabled="v.online_stock <= 0">{{ Object.values(v.attributes || {}).join(' ') || 'Standard' }} · {{ money(v.sale_price) }}{{ v.online_stock <= 0 ? ' (sold out)' : '' }}</option>
               </select>
               <button class="mt-3 s-btn !py-2 text-sm" :class="inBox(p) ? 's-btn-dark' : 's-btn-line'" :disabled="!inBox(p) && (full || (variantOf(p)?.online_stock || 0) <= 0)" @click="inBox(p) ? remove(picks.findIndex((x) => x.product._id === p._id)) : add(p)">
@@ -128,7 +128,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
           </form>
           <div class="rounded-2xl s-band p-8 flex items-center justify-center">
             <div class="w-full max-w-xs aspect-[3/4] rounded-xl bg-cream text-noir-800 shadow-lift p-7 flex flex-col text-center rotate-[-2deg]">
-              <p class="text-[0.6rem] tracking-[0.3em] uppercase text-gold-dark">Scentology</p>
+              <p class="text-[0.6rem] tracking-[0.3em] uppercase text-gold-dark">{{ shop.name }}</p>
               <span class="s-rule mx-auto mt-3 !w-10" />
               <p class="font-display text-2xl mt-6">{{ card.to ? `Dear ${card.to},` : 'Dear…' }}</p>
               <p class="font-display text-lg italic mt-4 leading-relaxed whitespace-pre-line flex-1 text-ink-soft">{{ card.message || 'Your message appears here.' }}</p>

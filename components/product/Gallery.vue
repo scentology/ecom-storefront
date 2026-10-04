@@ -1,5 +1,6 @@
 <script setup>
-// Product pictures: the main one zooms where the pointer is; clicking opens a full screen viewer (arrows, Esc).
+// Product pictures in a portrait (4:5) frame, contained on cream so square bottle shots and apparel both sit well;
+// the main one zooms where the pointer is; clicking opens a full screen viewer (arrows, Esc).
 const props = defineProps({ pics: { type: Array, default: () => [] }, title: String, badge: String })
 const active = defineModel({ type: Number, default: 0 })
 const zoom = reactive({ on: false, x: 50, y: 50 })
@@ -24,18 +25,18 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 <template>
   <div>
     <button
-      type="button" class="relative block w-full aspect-square rounded-2xl overflow-hidden bg-white ring-1 ring-line cursor-zoom-in"
+      type="button" class="relative block w-full aspect-[4/5] rounded-2xl overflow-hidden bg-cream ring-1 ring-line cursor-zoom-in"
       :aria-label="`View ${title} full screen`" @mouseenter="zoom.on = true" @mouseleave="zoom.on = false" @mousemove="move" @click="viewer = true"
     >
       <Transition mode="out-in" enter-from-class="opacity-0" enter-active-class="transition-opacity duration-300" leave-to-class="opacity-0" leave-active-class="transition-opacity duration-150">
-        <img v-if="pics[active]" :key="pics[active]" :src="pics[active]" :alt="title" class="w-full h-full object-cover transition-transform duration-200" :style="zoom.on ? { transform: 'scale(1.8)', transformOrigin: `${zoom.x}% ${zoom.y}%` } : {}">
+        <img v-if="pics[active]" :key="pics[active]" :src="pics[active]" :alt="title" class="w-full h-full object-contain transition-transform duration-200" :style="zoom.on ? { transform: 'scale(1.8)', transformOrigin: `${zoom.x}% ${zoom.y}%` } : {}">
       </Transition>
       <span v-if="badge" class="absolute left-4 top-4 rounded-full bg-sale text-white text-xs font-bold px-3 py-1">{{ badge }}</span>
       <span class="absolute right-4 bottom-4 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow-card"><Icon name="lucide:expand" class="w-4 h-4" /></span>
     </button>
     <div v-if="pics.length > 1" class="flex gap-3 mt-4 overflow-x-auto s-no-scrollbar">
-      <button v-for="(img, i) in pics" :key="img" class="w-20 h-20 shrink-0 rounded-xl overflow-hidden ring-2 transition" :class="active === i ? 'ring-noir-800' : 'ring-transparent opacity-70 hover:opacity-100'" :aria-label="`Picture ${i + 1}`" @click="active = i">
-        <img :src="img" alt="" class="w-full h-full object-cover" loading="lazy">
+      <button v-for="(img, i) in pics" :key="img" class="w-20 h-24 shrink-0 rounded-xl overflow-hidden bg-cream ring-2 transition" :class="active === i ? 'ring-noir-800' : 'ring-transparent opacity-70 hover:opacity-100'" :aria-label="`Picture ${i + 1}`" @click="active = i">
+        <img :src="img" alt="" class="w-full h-full object-contain" loading="lazy">
       </button>
     </div>
 

@@ -22,7 +22,7 @@ const loadReturns = async () => {
 }
 watch(order, loadReturns)
 const canReturn = computed(() => returnable.value?.within_window && returnable.value.lines.some((l) => l.returnable > 0))
-const REASONS = ['Wrong size or scent', 'Arrived damaged', 'Not as described', 'Changed my mind', 'Wrong item sent']
+const REASONS = ['Wrong size or colour', "Doesn't fit", 'Arrived damaged', 'Not as described', 'Changed my mind', 'Wrong item sent']
 const RETURN_STATUS = {
   requested: 'Waiting for approval', approved: 'Approved: send the item back', received: 'Received: refund on its way',
   completed: 'Refunded', rejected: 'Not accepted', cancelled: 'Cancelled',

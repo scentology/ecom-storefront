@@ -1,5 +1,5 @@
 <script setup>
-// Combos: sets of fragrances priced below buying them one by one (sold from the same stock).
+// Combos: sets of products (fragrance pairings, outfit sets…) priced below buying them one by one (sold from the same stock).
 const route = useRoute()
 const router = useRouter()
 const { data: attributes } = await useAttributes()
@@ -23,16 +23,16 @@ const set = (patch) => {
 const search = ref(q.value.q || '')
 let timer
 watch(search, (v) => { clearTimeout(timer); timer = setTimeout(() => set({ q: v.trim() || undefined }), 300) })
-useSeoMeta({ title: 'Fragrance combos', description: 'Expertly paired fragrance sets, priced to save.' })
+useSeoMeta({ title: 'Combos & sets', description: 'Expertly paired sets, priced below buying them one by one.' })
 </script>
 
 <template>
   <div>
-    <UiPageHero eyebrow="Curated sets" title="Fragrance combos" :note="pending ? 'Loading…' : `${total} expertly paired ${total === 1 ? 'set' : 'sets'}, priced to save`" />
+    <UiPageHero eyebrow="Curated sets" title="Combos & sets" :note="pending ? 'Loading…' : `${total} expertly paired ${total === 1 ? 'set' : 'sets'}, priced to save`" />
     <div class="border-b border-line bg-cream-deep/60">
       <div class="s-container py-4 flex flex-wrap items-center gap-3">
         <input v-model="search" class="s-input !py-2.5 sm:!w-80" placeholder="Search combos" aria-label="Search combos">
-        <div class="flex gap-2 overflow-x-auto">
+        <div v-if="genders.length" class="flex gap-2 overflow-x-auto">
           <button class="s-chip shrink-0" :class="{ 's-chip-on': !q.gender }" @click="set({ gender: undefined })">Everyone</button>
           <button v-for="g in genders" :key="g.slug" class="s-chip shrink-0" :class="{ 's-chip-on': q.gender === g.slug }" @click="set({ gender: g.slug })">{{ g.label }}</button>
         </div>

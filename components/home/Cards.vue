@@ -1,5 +1,5 @@
 <script setup>
-// Picture cards: three (her, him, unisex: the last one wide), four (two by two) or three equal.
+// Picture cards: three (e.g. categories or audiences: the last one wide when dark), four (two by two) or three equal.
 const props = defineProps({ section: { type: Object, required: true } })
 const links = computed(() => props.section.links || [])
 const wideLast = computed(() => links.value.length === 3 && props.section.dark)
