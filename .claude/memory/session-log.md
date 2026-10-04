@@ -95,3 +95,5 @@
 
 - Added `.drone.yml`: push to `main` deploys to 139.162.8.118 (scentology.bd / control.scentology.bd / api.scentology.bd). See deployment.md.
 - 2026-09-30: customer sign-in is by **email code** now (was phone SMS): `/auth/otp/request|verify` take `email`; code sent with the mailer (Orb in prod). Staff emails are refused there. Customers found/created by email; phone comes from the delivery address (or the pickup phone field on the storefront).
+
+- 2026-10-05: cart ownership / POS email / customer merge changed nothing here. `POST /orders` now needs the cart to belong to the signed-in customer: checkout already creates/updates its cart with the token, so keep it that way.
