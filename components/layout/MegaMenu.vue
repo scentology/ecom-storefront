@@ -55,8 +55,8 @@ const cardShape = (c) => ((c.span || 1) >= 2 && pictured(c) >= 3 ? 'aspect-[16/1
         <ul class="grid gap-3" :style="{ gridTemplateColumns: `repeat(${Math.max(2, Math.min(6, (c.span || 1) * 2))}, minmax(0, 1fr))` }">
           <li v-for="(l, i) in brandLinks(c)" :key="i">
             <NuxtLink :to="l.href" class="group relative flex items-center justify-center h-20 rounded-xl overflow-hidden bg-cream/60 ring-1 ring-line hover:bg-white hover:ring-gold/60 hover:shadow-card transition" :title="l.display_label">
-              <!-- logo files keep the mark in their middle third: scale it up to fill the tile -->
-              <img v-if="l.display_image" :src="l.display_image" :alt="l.display_label" loading="lazy" class="absolute inset-0 w-full h-full object-contain scale-[1.45] opacity-85 group-hover:opacity-100 transition">
+              <!-- logo files keep the mark in their middle third: scale it up to nearly fill the tile -->
+              <img v-if="l.display_image" :src="l.display_image" :alt="l.display_label" loading="lazy" class="absolute inset-0 w-full h-full object-contain scale-[1.28] opacity-85 group-hover:opacity-100 transition">
               <span v-else class="text-sm text-ink text-center">{{ l.display_label }}</span>
             </NuxtLink>
           </li>
