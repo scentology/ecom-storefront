@@ -94,7 +94,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
           <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-6" :class="{ 'opacity-60': pending }">
             <article v-for="p in choices" :key="p._id" class="rounded-2xl bg-white ring-1 p-4 flex flex-col transition" :class="inBox(p) ? 'ring-noir-800' : 'ring-line'">
               <div class="flex gap-3">
-                <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-20 h-20 rounded-xl object-cover ring-1 ring-line" loading="lazy">
+                <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-20 h-20 rounded-xl object-contain p-1.5 bg-white ring-1 ring-line" loading="lazy">
                 <div class="min-w-0">
                   <p class="text-[0.65rem] tracking-[0.18em] uppercase text-ink-faint">{{ p.brand?.name }}</p>
                   <p class="font-display text-lg leading-snug text-noir-800 line-clamp-2">{{ p.title }}</p>
@@ -157,7 +157,7 @@ const STEPS = ['Select', 'Personalise', 'Checkout']
           <p class="text-sm font-semibold text-noir-800">Chosen ({{ picks.length }}/{{ max }})</p>
           <ul v-if="picks.length" class="mt-3 space-y-3">
             <li v-for="(x, i) in picks" :key="x.product._id" class="flex items-center gap-3">
-              <img :src="x.variant.image || imagesOf(x.product)[0]" alt="" class="w-12 h-12 rounded-lg object-cover ring-1 ring-line">
+              <img :src="x.variant.image || imagesOf(x.product)[0]" alt="" class="w-12 h-12 rounded-lg object-contain p-1 bg-white ring-1 ring-line">
               <span class="min-w-0 flex-1"><span class="block text-sm truncate text-noir-800">{{ x.product.title }}</span><span class="block text-xs text-ink-faint">{{ Object.values(x.variant.attributes || {}).join(' ') }} · {{ money(x.variant.sale_price) }}</span></span>
               <button class="text-ink-faint hover:text-sale p-1" :aria-label="`Remove ${x.product.title}`" @click="remove(i)"><Icon name="lucide:x" class="w-4 h-4" /></button>
             </li>

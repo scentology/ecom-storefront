@@ -124,3 +124,13 @@
   `public/logo-dark.png` (light grounds). Redrawn from a 410×512 WhatsApp JPEG: emblem upscaled ×12 with re-sharpened edges,
   wordmark re-set in Lora 600 ("Scentology.BD") and Montserrat 500 (tagline). Favicon / touch icons are the emblem on noir
   (`favicon-32.png`, `icon-192/512.png`, `apple-touch-icon.png`); `favicon.svg` removed.
+
+## 2026-10-09 — Demo polish
+
+- Header: logo on the far left, menu right after it, icons on the right.
+- Product pictures are transparent cut-outs (WebP, 1000×1250, bottle padded); cards, gallery, bag, search, wishlist,
+  checkout and order pages contain them with padding on white instead of cropping.
+- Sign-in asks for the email only; the account page asks a name once ("What should we call you?") while the account
+  has none, then shows a sidebar (initials, Orders / Wishlist / Profile / Rewards, Sign out) beside the open section (?tab=).
+- Mega menu: picture cards sit in one row (portrait for 1–2, landscape for 3–4); Top brands are logo tiles (logo files
+  keep the mark in their middle third, so the tile scales them ×1.45).

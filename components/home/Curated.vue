@@ -18,7 +18,7 @@ const sizes = (p) => (p.options?.length ? p.options.map((o) => (o.values || []).
               <NuxtLink :to="productUrl(p)" class="mx-auto w-full max-w-sm">
                 <span class="block rounded-t-full ring-1 ring-gold/40 p-2">
                   <span class="block aspect-[4/5] rounded-t-full overflow-hidden bg-white">
-                    <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-cover object-top" loading="lazy">
+                    <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-contain px-8 pt-14 pb-6" loading="lazy">
                   </span>
                 </span>
               </NuxtLink>

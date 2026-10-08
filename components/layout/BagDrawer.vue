@@ -28,7 +28,7 @@ const attrs = (a) => Object.values(a || {}).join(' · ')
           <ul v-else class="flex-1 overflow-y-auto divide-y divide-line px-6" data-lenis-prevent>
             <li v-for="l in cart.lines.value" :key="l.variant_id" class="py-5 flex gap-4">
               <NuxtLink :to="`/products/${l.slug}`" class="w-20 h-24 shrink-0 rounded-lg overflow-hidden bg-white border border-line" @click="close">
-                <img v-if="l.thumb" :src="l.thumb" :alt="l.title" class="w-full h-full object-cover" loading="lazy">
+                <img v-if="l.thumb" :src="l.thumb" :alt="l.title" class="w-full h-full object-contain p-1.5" loading="lazy">
               </NuxtLink>
               <div class="flex-1 min-w-0">
                 <NuxtLink :to="`/products/${l.slug}`" class="font-medium leading-snug hover:underline" @click="close">{{ l.title }}</NuxtLink>

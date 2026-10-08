@@ -168,7 +168,7 @@ useHead({
           <ul class="mt-4 divide-y divide-line rounded-2xl bg-white ring-1 ring-line">
             <li v-for="b in variant.bundle" :key="b.variant_id">
               <NuxtLink :to="b.slug ? `/products/${b.slug}` : '#'" class="flex items-center gap-4 p-4 hover:bg-cream/60 transition">
-                <img v-if="b.thumb" :src="b.thumb" alt="" class="w-14 h-14 rounded-lg object-cover ring-1 ring-line" loading="lazy">
+                <img v-if="b.thumb" :src="b.thumb" alt="" class="w-14 h-14 rounded-lg object-contain p-1 bg-white ring-1 ring-line" loading="lazy">
                 <span class="flex-1 min-w-0">
                   <span class="block text-noir-800 font-medium truncate">{{ b.title }}</span>
                   <span class="block text-xs text-ink-faint">{{ Object.values(b.attributes || {}).join(' · ') || 'One size' }}</span>

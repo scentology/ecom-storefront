@@ -80,7 +80,7 @@ const addToBag = (e) => cart.add({
           <li v-for="e in entries" :key="e.id" class="relative flex flex-col">
             <NuxtLink :to="productUrl(e.product)" class="group block">
               <div class="relative aspect-[4/5] overflow-hidden rounded-xl bg-white ring-1 ring-line">
-                <img v-if="e.thumb" :src="e.thumb" :alt="e.product.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]">
+                <img v-if="e.thumb" :src="e.thumb" :alt="e.product.title" loading="lazy" class="absolute inset-0 w-full h-full object-contain p-5 transition duration-700 group-hover:scale-[1.04]">
                 <div v-else class="absolute inset-0 flex items-center justify-center text-gold-dark"><Icon name="lucide:image" class="w-10 h-10" /></div>
                 <span v-if="e.any <= 0" class="absolute left-3 top-3 rounded-full bg-ink/80 text-white text-[0.7rem] font-semibold px-2.5 py-1">Sold out</span>
               </div>

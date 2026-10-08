@@ -182,7 +182,7 @@ const place = async () => {
               <p><span class="text-ink-soft">Signed in as</span> <strong>{{ auth.user.value?.name || auth.user.value?.email }}</strong> <span class="text-ink-faint break-all">{{ auth.user.value?.email || localPhone(auth.user.value?.phone) }}</span></p>
               <button class="text-ink-soft underline" @click="auth.signOut(); addresses = []">Not you?</button>
             </div>
-            <div v-else class="mt-6 max-w-sm"><AuthEmailSignIn ask-name @done="onSignedIn" /></div>
+            <div v-else class="mt-6 max-w-sm"><AuthEmailSignIn @done="onSignedIn" /></div>
           </ClientOnly>
         </section>
 
@@ -255,7 +255,7 @@ const place = async () => {
         <h2 class="font-display text-2xl">Order summary</h2>
         <ul class="mt-5 divide-y divide-line">
           <li v-for="l in cart.lines.value" :key="l.variant_id" class="py-3 flex gap-3 text-sm">
-            <img v-if="l.thumb" :src="l.thumb" alt="" class="w-14 h-16 rounded-lg object-cover ring-1 ring-line">
+            <img v-if="l.thumb" :src="l.thumb" alt="" class="w-14 h-16 rounded-lg object-contain p-1 bg-white ring-1 ring-line">
             <span class="flex-1 min-w-0"><span class="block font-medium truncate">{{ l.title }}</span><span class="text-ink-faint text-xs">{{ Object.values(l.attrs || {}).join(' · ') }} · × {{ l.qty }}</span></span>
             <span class="tabular-nums">{{ money(l.price * l.qty) }}</span>
           </li>

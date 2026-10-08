@@ -91,7 +91,7 @@ const range = (p) => {
                 <ul v-if="results.length" :class="{ 'opacity-60': loading }">
                   <li v-for="(p, i) in results" :key="p._id">
                     <NuxtLink :to="productUrl(p)" class="flex items-center gap-4 px-5 py-2.5 transition" :class="active === i ? 'bg-cream-deep' : 'hover:bg-cream-deep/60'" @click="emit('close')" @mouseenter="active = i">
-                      <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" alt="" class="w-12 h-12 rounded-lg object-cover bg-white ring-1 ring-line" loading="lazy">
+                      <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" alt="" class="w-12 h-12 rounded-lg object-contain p-1 bg-white ring-1 ring-line" loading="lazy">
                       <span class="min-w-0 flex-1">
                         <span v-if="p.brand || p.is_combo" class="block text-[0.65rem] tracking-[0.18em] uppercase text-ink-faint">{{ p.is_combo ? 'Combo' : p.brand.name }}</span>
                         <span class="block truncate text-noir-800">{{ p.title }}</span>

@@ -19,7 +19,7 @@ defineProps({ section: { type: Object, required: true } })
           <template #item="{ item: p, active }">
             <NuxtLink :to="productUrl(p)" class="group block rounded-3xl bg-white/5 ring-1 p-4 transition duration-500" :class="active ? 'ring-gold/50 bg-white/10' : 'ring-white/10 opacity-75'">
               <div class="relative aspect-square rounded-2xl overflow-hidden bg-white">
-                <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <img v-if="imagesOf(p)[0]" :src="imagesOf(p)[0]" :alt="p.title" class="w-full h-full object-contain p-4 transition duration-700 group-hover:scale-105" loading="lazy">
                 <span v-if="comboSaving(p)" class="absolute left-3 top-3 rounded-full bg-gold-light text-noir-900 text-[0.68rem] font-bold uppercase tracking-wide px-2.5 py-1">Save up to {{ money(comboSaving(p)) }}</span>
               </div>
               <p class="text-center mt-4 text-[0.65rem] tracking-[0.2em] uppercase text-cream/50">Combo</p>

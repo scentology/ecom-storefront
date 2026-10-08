@@ -1,12 +1,12 @@
 <script setup>
-// Two steps: email → 6 digit code from the inbox. Emits "done" once signed in.
-const props = defineProps({ askName: Boolean, compact: Boolean })
+// Two steps: email → 6 digit code from the inbox. Emits "done" once signed in. Only the email is asked: the name
+// is asked once signed in, and only while the account has none (account page, checkout address).
+defineProps({ compact: Boolean })
 const emit = defineEmits(['done'])
 const auth = useAuth()
 
 const step = ref('email')
 const email = ref('')
-const name = ref('')
 const code = ref('')
 const busy = ref(false)
 const error = ref('')
@@ -30,7 +30,7 @@ const send = async () => {
 const verify = async () => {
   busy.value = true; error.value = ''
   try {
-    const data = await auth.verifyCode(email.value, code.value, name.value)
+    const data = await auth.verifyCode(email.value, code.value)
     emit('done', data)
   } catch (e) { error.value = e.message } finally { busy.value = false }
 }
@@ -39,10 +39,6 @@ const verify = async () => {
 <template>
   <div>
     <form v-if="step === 'email'" class="space-y-4" @submit.prevent="send">
-      <div v-if="askName">
-        <label for="si-name" class="block text-sm font-medium mb-1.5">Your name</label>
-        <input id="si-name" v-model="name" class="s-input" autocomplete="name" placeholder="e.g. Nusrat Jahan">
-      </div>
       <div>
         <label for="si-email" class="block text-sm font-medium mb-1.5">Email</label>
         <input id="si-email" v-model="email" type="email" inputmode="email" required autocomplete="email" autocapitalize="off" spellcheck="false" class="s-input" placeholder="you@example.com">

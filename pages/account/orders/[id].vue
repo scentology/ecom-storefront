@@ -91,7 +91,7 @@ watch(order, async (o) => {
         <div class="mt-8 grid md:grid-cols-[1fr_18rem] gap-6">
           <ul class="rounded-2xl bg-white ring-1 ring-line divide-y divide-line">
             <li v-for="p in order.products" :key="p.variant_id" class="p-4 flex gap-4">
-              <img :src="p.product_thumb" alt="" class="w-16 h-20 rounded-lg object-cover ring-1 ring-line">
+              <img :src="p.product_thumb" alt="" class="w-16 h-20 rounded-lg object-contain p-1 bg-white ring-1 ring-line">
               <div class="flex-1 min-w-0"><p class="font-medium">{{ p.product_title }}</p><p class="text-xs text-ink-faint">{{ Object.values(p.variant_attributes || {}).join(' · ') }} · × {{ p.quantity }}</p></div>
               <p class="tabular-nums">{{ money(p.total_amount) }}</p>
             </li>
@@ -142,7 +142,7 @@ watch(order, async (o) => {
           <form v-if="asking" class="mt-5 space-y-4" @submit.prevent="sendReturn">
             <div v-for="l in returnable.lines.filter((x) => x.returnable > 0)" :key="l.variant_id" class="grid sm:grid-cols-[1fr_6rem_14rem] gap-3 items-center">
               <div class="flex items-center gap-3 min-w-0">
-                <img v-if="l.thumb" :src="l.thumb" alt="" class="w-12 h-14 rounded-lg object-cover ring-1 ring-line">
+                <img v-if="l.thumb" :src="l.thumb" alt="" class="w-12 h-14 rounded-lg object-contain p-1 bg-white ring-1 ring-line">
                 <div class="min-w-0"><p class="font-medium truncate">{{ l.title }}</p><p class="text-xs text-ink-faint">{{ Object.values(l.variant_attributes || {}).join(' · ') }} · {{ money(l.unit_refund) }} each</p></div>
               </div>
               <select v-model.number="picks[l.variant_id].qty" class="s-input !py-2" :aria-label="`How many ${l.title}`">

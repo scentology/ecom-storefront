@@ -1,5 +1,5 @@
 <script setup>
-// Grid card: image (second image on hover), brand/category eyebrow, title, colour dots, price; heart adds it to the wishlist.
+// Grid card: image contained with padding on white (pictures are cut-outs; second one on hover), brand/category eyebrow, title, colour dots, price; heart adds it to the wishlist.
 const props = defineProps({ product: { type: Object, required: true }, eager: Boolean })
 const saved = useWishlist()
 const price = computed(() => priceOf(props.product))
@@ -19,9 +19,9 @@ const soldOut = computed(() => (props.product.variants || []).length > 0 && onli
       <div class="relative aspect-[4/5] overflow-hidden rounded-xl bg-white ring-1 ring-line">
         <img
           v-if="pics[0]" :src="pics[0]" :alt="product.title" :loading="eager ? 'eager' : 'lazy'"
-          class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]" :class="{ 'group-hover:opacity-0': pics[1] }"
+          class="absolute inset-0 w-full h-full object-contain p-5 sm:p-6 transition duration-700 group-hover:scale-[1.05]" :class="{ 'group-hover:opacity-0': pics[1] }"
         >
-        <img v-if="pics[1]" :src="pics[1]" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-0 transition duration-700 group-hover:opacity-100">
+        <img v-if="pics[1]" :src="pics[1]" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-contain p-5 sm:p-6 opacity-0 transition duration-700 group-hover:opacity-100">
         <div v-if="!pics[0]" class="absolute inset-0 flex items-center justify-center text-gold-dark"><Icon name="lucide:image" class="w-10 h-10" /></div>
         <div class="absolute left-3 top-3 flex flex-col gap-1.5">
           <span v-if="comboSaving(product)" class="rounded-full bg-gold-light text-noir-900 text-[0.68rem] font-bold uppercase tracking-wide px-2.5 py-1">Save {{ money(comboSaving(product)) }}</span>

@@ -1,5 +1,5 @@
 <script setup>
-// Centred logo; the main menu (from the admin's menu builder) on the left with mega dropdowns; search, wishlist,
+// Logo on the left, then the main menu (from the admin's menu builder) with mega dropdowns; search, wishlist,
 // bag and account on the right. Phones get a drill-down menu.
 const { data: menu } = await useMenu()
 const cart = useCart()
@@ -44,10 +44,12 @@ const compact = computed(() => (items.value?.length || 0) > 5)
 
 <template>
   <header class="sticky top-0 z-40 bg-noir-900/95 backdrop-blur text-cream border-b border-white/10 transition-shadow" :class="{ 'shadow-lift': scrolled }" @mouseleave="hoverClose">
-    <div class="s-container h-16 sm:h-[4.5rem] grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-      <!-- left: the menu -->
-      <nav class="flex items-center gap-1 min-w-0" aria-label="Main">
-        <button class="-ml-2 p-2" :class="compact ? 'xl:hidden' : 'lg:hidden'" aria-label="Open menu" @click="menuOpen = true"><Icon name="lucide:menu" class="w-6 h-6" /></button>
+    <div class="s-container h-16 sm:h-[4.5rem] flex items-center gap-3 sm:gap-6">
+      <button class="-ml-2 p-2 shrink-0" :class="compact ? 'xl:hidden' : 'lg:hidden'" aria-label="Open menu" @click="menuOpen = true"><Icon name="lucide:menu" class="w-6 h-6" /></button>
+      <LayoutLogo light class="shrink-0" />
+
+      <!-- the menu, after the logo -->
+      <nav class="flex-1 flex items-center min-w-0 lg:pl-4 xl:pl-6" aria-label="Main">
         <ul class="hidden items-center gap-5 xl:gap-7 text-[0.9rem] whitespace-nowrap" :class="compact ? 'xl:flex' : 'lg:flex'">
           <li v-for="(it, i) in items" :key="i" @mouseenter="it.columns?.length ? hoverOpen(i) : hoverClose()">
             <button
@@ -65,10 +67,8 @@ const compact = computed(() => (items.value?.length || 0) > 5)
         </ul>
       </nav>
 
-      <LayoutLogo light />
-
       <!-- right -->
-      <div class="flex items-center justify-end gap-0.5 sm:gap-1.5">
+      <div class="ml-auto flex items-center justify-end gap-0.5 sm:gap-1.5 shrink-0">
         <button class="p-2.5 hover:text-gold transition-colors" aria-label="Search (press /)" @click="searchOpen = true"><Icon name="lucide:search" class="w-5 h-5" /></button>
         <NuxtLink to="/wishlist" class="relative p-2.5 hover:text-gold transition-colors hidden sm:inline-flex" aria-label="Wishlist">
           <Icon name="lucide:heart" class="w-5 h-5" />
