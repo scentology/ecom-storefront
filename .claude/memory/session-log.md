@@ -117,3 +117,10 @@
 
 - `useWishlist`: signed in, the API list is the source of truth (`GET/PUT/DELETE /wishlist`, `POST /wishlist/merge` with the local ids on sign-in/app start, local list cleared after a successful merge); guests keep `ecom_saved_v1`. Watchers live in a detached `effectScope` so they outlive the first caller. Toggle is optimistic with rollback + toast; product page saves the selected variant.
 - `/wishlist` page (picked size/colour, price, stock, Add to bag with the picked variant or Choose options, remove; guest sign-in prompt); `/saved` redirects to it. Header/phone menu say "Wishlist".
+
+## 2026-10-09 — Client logo
+
+- `components/layout/Logo.vue` now shows the client's artwork: `public/logo.png` (gold, for dark grounds, `light`) and
+  `public/logo-dark.png` (light grounds). Redrawn from a 410×512 WhatsApp JPEG: emblem upscaled ×12 with re-sharpened edges,
+  wordmark re-set in Lora 600 ("Scentology.BD") and Montserrat 500 (tagline). Favicon / touch icons are the emblem on noir
+  (`favicon-32.png`, `icon-192/512.png`, `apple-touch-icon.png`); `favicon.svg` removed.
