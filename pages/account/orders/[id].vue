@@ -71,6 +71,10 @@ watch(order, async (o) => {
           <Icon name="lucide:circle-check" class="w-12 h-12 mx-auto text-gold" />
           <h1 class="s-title text-4xl mt-4">Thank you, <em class="s-gold-text">order placed</em></h1>
           <p class="text-cream/70 mt-3">Order {{ order.invoice_id }}. We'll let you know when it ships.</p>
+          <div v-if="order.fulfilment !== 'pickup'" class="mt-7 mx-auto max-w-xl text-left rounded-xl border border-gold/40 bg-gold/10 px-5 py-4 flex gap-3" role="note">
+            <Icon name="lucide:video" class="w-5 h-5 text-gold shrink-0 mt-0.5" />
+            <p class="text-sm leading-relaxed text-cream/85"><strong class="block text-cream mb-1">⚠️ গুরুত্বপূর্ণ নোটিশ</strong>আনবক্সিং এর সময় ভিডিও করে রাখবেন। কুরিয়ারের কোনো ত্রুটির কারণে যদি সমস্যা হয়, তাহলে আমরা যাতে দ্রুত সমাধান করে দিতে পারি — তাই আনবক্সিং ভিডিও থাকা আবশ্যক।</p>
+          </div>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
