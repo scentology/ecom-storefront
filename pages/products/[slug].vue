@@ -35,6 +35,8 @@ const pics = computed(() => {
 watch(() => lookVariant.value?.image, () => { active.value = 0 })
 
 const inStock = computed(() => (variant.value?.online_stock || 0) > 0)
+// none of its sizes can be bought online: a badge, and the wishlist takes the place of the bag
+const allSoldOut = computed(() => (p.value?.variants || []).length > 0 && onlineStockOf(p.value) <= 0)
 const price = computed(() => (variant.value ? { min: variant.value.sale_price, was: variant.value.original_price > variant.value.sale_price ? variant.value.original_price : 0 } : priceOf(p.value)))
 const qty = ref(1)
 const inBag = computed(() => cart.lines.value.find((l) => l.variant_id === variant.value?._id)?.qty || 0)
@@ -148,7 +150,8 @@ useHead({
         </p>
         <h1 class="s-title text-4xl sm:text-5xl text-noir-800 mt-2">{{ p.title }}</h1>
         <a v-if="p.rating?.count" href="#reviews" class="inline-flex items-center gap-2 mt-3 text-sm text-ink-soft hover:text-noir-800"><ProductStars :value="p.rating.average" /> {{ p.rating.average.toFixed(1) }} · {{ p.rating.count }} {{ p.rating.count === 1 ? 'review' : 'reviews' }}</a>
-        <div v-if="limited || p.featured" class="flex gap-2 mt-3">
+        <div v-if="limited || p.featured || allSoldOut" class="flex gap-2 mt-3">
+          <span v-if="allSoldOut" class="rounded-full bg-ink/80 text-white text-[0.7rem] font-semibold tracking-wide uppercase px-3 py-1">Sold out</span>
           <span v-if="limited" class="rounded-full bg-noir-800 text-gold-light text-[0.7rem] font-semibold tracking-wide uppercase px-3 py-1">Limited edition</span>
           <span v-if="p.featured" class="rounded-full bg-gold/15 text-gold-dark text-[0.7rem] font-semibold tracking-wide uppercase px-3 py-1">Featured</span>
         </div>
@@ -200,15 +203,17 @@ useHead({
         </ClientOnly>
 
         <div ref="buyRow" class="mt-6 flex gap-3">
-          <div class="inline-flex items-center rounded-full border border-line-strong bg-white">
+          <div v-if="inStock" class="inline-flex items-center rounded-full border border-line-strong bg-white">
             <button class="p-3.5" aria-label="One less" :disabled="qty <= 1" @click="qty--"><Icon name="lucide:minus" class="w-4 h-4" /></button>
             <span class="w-8 text-center tabular-nums" aria-live="polite">{{ qty }}</span>
             <button class="p-3.5" aria-label="One more" :disabled="!variant || qty >= variant.online_stock" @click="qty++"><Icon name="lucide:plus" class="w-4 h-4" /></button>
           </div>
           <button class="s-btn-dark flex-1" :disabled="!inStock" @click="addToBag"><Icon name="lucide:shopping-bag" class="w-4 h-4" /> {{ inStock ? 'Add to bag' : 'Sold out' }}</button>
           <ClientOnly>
-            <button class="s-btn-line !px-4" :aria-pressed="saved.has(p._id)" :aria-label="saved.has(p._id) ? 'Remove from wishlist' : 'Add to wishlist'" @click="saved.toggle(p._id, variant?._id, p)">
+            <!-- sold out: saving it for later is the thing to do, so the heart gets a label -->
+            <button :class="inStock ? 's-btn-line !px-4' : 's-btn-line flex-1'" :aria-pressed="saved.has(p._id)" :aria-label="saved.has(p._id) ? 'Remove from wishlist' : 'Add to wishlist'" @click="saved.toggle(p._id, variant?._id, p)">
               <Icon name="lucide:heart" class="w-5 h-5" :class="saved.has(p._id) ? 'text-sale fill-current' : ''" />
+              <template v-if="!inStock">{{ saved.has(p._id) ? 'On your wishlist' : 'Add to wishlist' }}</template>
             </button>
           </ClientOnly>
         </div>
@@ -311,7 +316,8 @@ useHead({
     <Transition enter-from-class="translate-y-full" enter-active-class="transition duration-300" leave-to-class="translate-y-full" leave-active-class="transition duration-200">
       <div v-if="stickyBuy" class="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-noir-900 text-cream px-4 py-3 flex items-center gap-3 shadow-lift">
         <span class="min-w-0 flex-1"><span class="block text-sm truncate">{{ p.title }}</span><span class="block text-xs text-gold-light tabular-nums">{{ money(price.min) }}<template v-if="variant"> · {{ Object.values(variant.attributes || {}).join(' ') }}</template></span></span>
-        <button class="s-btn-gold !py-2.5 !px-5" :disabled="!inStock" @click="addToBag">{{ inStock ? 'Add to bag' : 'Sold out' }}</button>
+        <button v-if="inStock" class="s-btn-gold !py-2.5 !px-5" @click="addToBag">Add to bag</button>
+        <button v-else class="s-btn-gold !py-2.5 !px-5" :aria-pressed="saved.has(p._id)" @click="saved.toggle(p._id, variant?._id, p)"><Icon name="lucide:heart" class="w-4 h-4" :class="saved.has(p._id) ? 'fill-current' : ''" /> {{ saved.has(p._id) ? 'Saved' : 'Sold out · Save it' }}</button>
       </div>
     </Transition>
   </div>

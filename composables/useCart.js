@@ -22,6 +22,11 @@ export function useCart() {
   const subtotal = computed(() => lines.value.reduce((n, l) => n + l.qty * l.price, 0))
 
   const add = (line, qty = 1) => {
+    // a known stock of 0 is sold out (only an unknown max means no limit)
+    if (typeof line.max === 'number' && line.max <= 0) {
+      useToast().show({ title: 'Sold out', body: line.title })
+      return
+    }
     const existing = lines.value.find((l) => l.variant_id === line.variant_id)
     const cap = (n) => (line.max > 0 ? Math.min(n, line.max) : n)
     if (existing) existing.qty = cap(existing.qty + qty)
