@@ -268,7 +268,7 @@ const place = async () => {
           <div v-if="fromCard" class="flex justify-between"><dt class="text-ink-soft">Gift card</dt><dd>−{{ money(fromCard) }}</dd></div>
           <div v-if="fromCredit" class="flex justify-between"><dt class="text-ink-soft">Store credit</dt><dd>−{{ money(fromCredit) }}</dd></div>
           <div v-if="fromCard || fromCredit" class="flex justify-between font-semibold"><dt>To pay</dt><dd>{{ money(toPay) }}</dd></div>
-          <p class="text-xs text-ink-faint">Prices include VAT.</p>
+          <p v-if="priced?.vat > 0" class="text-xs text-ink-faint">Prices include VAT.</p>
         </dl>
         <div class="mt-5 pt-4 border-t border-line space-y-3 text-sm" :class="{ 'opacity-50 pointer-events-none': !priced }">
           <div v-if="coupon" class="flex items-center justify-between rounded-lg bg-gold/10 px-3 py-2">
