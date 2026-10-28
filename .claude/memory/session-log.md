@@ -134,5 +134,6 @@
   has none, then shows a sidebar (initials, Orders / Wishlist / Profile / Rewards, Sign out) beside the open section (?tab=).
 - Mega menu: picture cards sit in one row (portrait for 1–2, landscape for 3–4); Top brands are logo tiles (logo files
   keep the mark in their middle third, so the tile scales them ×1.45).
-- 2026-10-29: product card "Sold out" is a noir/gold diagonal ribbon across the top-left corner; when sold out it replaces the
-  discount/combo-saving pills (they share that corner). Price line still shows the struck-through was price.
+- 2026-10-29: product card "Sold out" is a `bg-sale` flag ribbon poking out past the card's left edge (folded tail
+  under it); it sits outside the image box because that box clips (overflow-hidden). When sold out the discount/combo
+  saving pills are hidden; the price line still shows the struck-through was price.
