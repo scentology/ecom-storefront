@@ -23,10 +23,13 @@ const soldOut = computed(() => (props.product.variants || []).length > 0 && onli
         >
         <img v-if="pics[1]" :src="pics[1]" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-contain p-5 sm:p-6 opacity-0 transition duration-700 group-hover:opacity-100">
         <div v-if="!pics[0]" class="absolute inset-0 flex items-center justify-center text-gold-dark"><Icon name="lucide:image" class="w-10 h-10" /></div>
-        <div class="absolute left-3 top-3 flex flex-col gap-1.5">
+        <!-- sold out: diagonal ribbon across the top-left corner (takes the place of the saving/discount pills) -->
+        <div v-if="soldOut" class="pointer-events-none absolute left-0 top-0 w-32 h-32 overflow-hidden" aria-label="Sold out">
+          <span class="absolute top-[26px] -left-[42px] w-[170px] -rotate-45 bg-noir-900 py-1.5 text-center text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-gold-light shadow-lift border-y border-gold/60">Sold out</span>
+        </div>
+        <div v-else class="absolute left-3 top-3 flex flex-col gap-1.5">
           <span v-if="comboSaving(product)" class="rounded-full bg-gold-light text-noir-900 text-[0.68rem] font-bold uppercase tracking-wide px-2.5 py-1">Save {{ money(comboSaving(product)) }}</span>
           <span v-else-if="off" class="rounded-full bg-sale text-white text-[0.7rem] font-bold px-2.5 py-1">−{{ off }}%</span>
-          <span v-if="soldOut" class="rounded-full bg-ink/80 text-white text-[0.7rem] font-semibold px-2.5 py-1">Sold out</span>
         </div>
       </div>
       <div class="pt-4 text-center px-2">
