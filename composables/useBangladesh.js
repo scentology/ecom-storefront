@@ -14,6 +14,7 @@ export const ORDER_STATUS = {
   PROCESSING: { label: 'Confirmed', tone: 'bg-gold/20 text-gold-deep' },
   ON_SHIPPING: { label: 'On the way', tone: 'bg-gold/20 text-gold-deep' },
   READY_FOR_PICKUP: { label: 'Ready to collect', tone: 'bg-green-100 text-green-800' },
+  DELIVERY_IN_PROGRESS: { label: 'Delivery in progress', tone: 'bg-gold/20 text-gold-deep' },
   DELIVERED: { label: 'Delivered', tone: 'bg-green-100 text-green-800' },
   RETURNED: { label: 'Returned', tone: 'bg-sale/10 text-sale' },
   CANCELLED: { label: 'Cancelled', tone: 'bg-cream-deep text-ink-soft' },
