@@ -45,7 +45,8 @@ const dropdowns = computed(() => props.menu.items || [])
                   <div class="mt-8 pt-6 border-t border-line space-y-3 text-sm">
                     <NuxtLink to="/wishlist" class="flex items-center gap-2" @click="emit('close')"><Icon name="lucide:heart" class="w-4 h-4" /> Wishlist</NuxtLink>
                     <NuxtLink to="/stores" class="flex items-center gap-2" @click="emit('close')"><Icon name="lucide:map-pin" class="w-4 h-4" /> Our stores</NuxtLink>
-                    <NuxtLink to="/account" class="s-btn-dark w-full mt-4" @click="emit('close')"><ClientOnly fallback="Sign in">{{ auth.signedIn.value ? 'My account' : 'Sign in' }}</ClientOnly></NuxtLink>
+                    <NuxtLink v-if="auth.signedIn.value" to="/account" class="s-btn-dark w-full mt-4" @click="emit('close')"><UiAvatar :user="auth.user.value" class="w-6 h-6 text-[0.6rem] -ml-1" /> My account</NuxtLink>
+                    <AuthGoogleSignIn v-else block class="mt-4" />
                   </div>
                 </div>
 

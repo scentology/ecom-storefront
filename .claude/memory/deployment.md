@@ -14,8 +14,10 @@ Every push to `main` deploys, so push only what is ready.
 | ecom-storefront | scentology.bd (www → apex) | `/var/www/scentology.bd` (`.output/` + `.env`) | supervisor `scentology_storefront` (node 22, 127.0.0.1:8092, `node --env-file=.env`) |
 | ecom-admin | control.scentology.bd | `/var/www/control.scentology.bd` (static SPA from `nuxt generate`) | nginx only |
 
-- **Config lives in Consul** (w2, `http://192.168.68.117:8500`, UI consul.octabits.org), never in git:
+- **Config lives in Consul** (w2, `http://192.168.68.117:8500`, UI consul.octabits.org behind basic auth), never in git. From the
+  laptop the LAN address doesn't route; use w2's Tailscale address `http://100.95.54.112:8500` (no auth, when the user allows it):
   `apps/ecom-api/prod/config.yml`, `apps/ecom-admin/prod/.env`, `apps/ecom-storefront/prod/.env`. Edit there, then re-run the build.
+- **Google sign-in** (2026-11-02): `google:` block in `apps/ecom-api/prod/config.yml` (client from Google Cloud project `scentology-513507`; `redirect_uris` must list `https://scentology.bd/auth/google/callback`, also an authorized redirect URI on the client). Without it `/auth/google*` answer 503 and nobody can sign in on the storefront.
   Deploy SSH key is shared with muniif: `apps/muniif-org/prod/deploy_key`. `ci` may only `sudo supervisorctl`.
 - **Mongo 8.0.21 + Redis** are local on the host, shared with muniif: db `scentology`, redis db 5/6, prefix `scentology_`.
   Passwords contain `#`, keep them quoted in YAML. Local docker Mongo is 8.3, so 8.0-only errors don't show locally.

@@ -16,11 +16,6 @@ const savedMsg = ref('')
 const localPhone = (p) => (p && p.startsWith('880') ? `0${p.slice(3)}` : p || '')
 
 const me = computed(() => auth.user.value || {})
-const initials = computed(() => {
-  const n = (me.value.name || me.value.email || '?').trim()
-  const parts = n.split(/[\s@.]+/).filter(Boolean)
-  return ((parts[0]?.[0] || '') + (me.value.name ? parts[1]?.[0] || '' : '')).toUpperCase() || '?'
-})
 const needsName = computed(() => auth.signedIn.value && !me.value.name)
 
 const tabs = computed(() => [
@@ -46,9 +41,19 @@ const load = async () => {
 // the session lives in shared state: load whenever it appears (first visit, or right after signing in)
 watch(() => auth.signedIn.value, (v) => { if (v) load() }, { immediate: true })
 
-const signedIn = () => {
+// signed out here (a bookmark, an old link): straight on to Google, back to ?next= or this page; home if they cancel
+const afterSignIn = computed(() => {
   const next = String(route.query.next || '')
-  if (next.startsWith('/') && !next.startsWith('//') && auth.user.value?.name) return navigateTo(next)
+  return next.startsWith('/') && !next.startsWith('//') ? next : '/account'
+})
+onMounted(() => { if (!auth.signedIn.value) auth.signIn(afterSignIn.value, '/') })
+
+// sign out from here: to the home page first (so this page doesn't flash the Google button), then end the session
+const toast = useToast()
+const signOut = async () => {
+  await navigateTo('/')
+  auth.signOut()
+  toast.show({ title: 'Signed out', body: 'See you soon.', icon: 'lucide:log-out' })
 }
 
 const saveName = async () => {
@@ -77,14 +82,13 @@ const date = (v) => (v ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', mont
 <template>
   <section class="s-container py-12 sm:py-16">
     <ClientOnly>
-      <!-- signed out -->
-      <div v-if="!auth.signedIn.value" class="max-w-md mx-auto">
-        <div class="text-center mb-8">
-          <LayoutLogo stacked class="mx-auto" />
-          <h1 class="s-title text-4xl text-noir-900 mt-8">Sign in</h1>
-          <p class="text-ink-soft mt-2">Track orders, save addresses and check out faster.</p>
-        </div>
-        <div class="rounded-3xl bg-white ring-1 ring-line p-8 shadow-card"><AuthEmailSignIn @done="signedIn" /></div>
+      <!-- signed out: on the way to Google (a button if that couldn't start) -->
+      <div v-if="!auth.signedIn.value" class="py-24 flex flex-col items-center text-center" aria-live="polite">
+        <template v-if="auth.googleBusy.value">
+          <span class="w-8 h-8 rounded-full border-2 border-line border-t-noir-900 animate-spin" aria-hidden="true" />
+          <p class="mt-5 text-ink-soft">Taking you to Google…</p>
+        </template>
+        <AuthGoogleSignIn v-else :next="afterSignIn" back="/" />
       </div>
 
       <!-- first sign-in: ask for a name once -->
@@ -110,7 +114,7 @@ const date = (v) => (v ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', mont
           <div class="bg-noir-900 text-cream px-6 pt-7 pb-6 relative overflow-hidden">
             <span class="absolute -right-10 -top-10 w-32 h-32 rounded-full border border-gold/20" />
             <div class="flex items-center gap-4 relative">
-              <span class="w-14 h-14 rounded-full bg-gradient-to-br from-gold-light to-gold-dark text-noir-900 flex items-center justify-center font-display text-2xl font-semibold shrink-0">{{ initials }}</span>
+              <UiAvatar :user="me" class="w-14 h-14 font-display text-2xl ring-2 ring-gold/40" />
               <div class="min-w-0">
                 <p class="text-[0.68rem] tracking-[0.22em] uppercase text-gold/90">My account</p>
                 <h1 class="font-display text-2xl leading-tight truncate">{{ me.name }}</h1>
@@ -130,7 +134,7 @@ const date = (v) => (v ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', mont
               <Icon v-else name="lucide:chevron-right" class="w-4 h-4 opacity-40" />
             </button>
             <div class="my-2 mx-4 border-t border-line" />
-            <button type="button" class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-[0.95rem] text-ink-soft hover:bg-cream hover:text-sale transition" @click="auth.signOut()">
+            <button type="button" class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-[0.95rem] text-ink-soft hover:bg-cream hover:text-sale transition" @click="signOut">
               <Icon name="lucide:log-out" class="w-[1.15rem] h-[1.15rem]" /> Sign out
             </button>
           </nav>

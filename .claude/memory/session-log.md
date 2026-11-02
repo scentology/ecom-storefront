@@ -137,3 +137,24 @@
 - 2026-10-29: product card "Sold out" is a `bg-sale` flag ribbon poking out past the card's left edge (folded tail
   under it); it sits outside the image box because that box clips (overflow-hidden). When sold out the discount/combo
   saving pills are hidden; the price line still shows the struck-through was price.
+
+## 2026-11-02 — Google sign-in replaces the emailed code (branch feat/google-sso in ecom-api + ecom-storefront)
+- API: `GET /auth/google/url?redirect_uri&state` (consent page address), `POST /auth/google {code, redirect_uri}` (code → id token
+  at Google's token endpoint, checks aud/iss/exp/email_verified; matches customers by email, creates on first sign-in, fills an empty
+  name; staff emails refused). redirect_uri must be in `google.redirect_uris`. Tests: user/usecase/google_test.go.
+- Storefront: `AuthGoogleSignIn` button (checkout, account) → Google → `/auth/google/callback` (state checked against the
+  `sc_google` cookie, then back to `next`). `EmailSignIn.vue` removed; API OTP endpoints left in place.
+- Verified locally up to Google's sign-in page (client + redirect accepted, secret accepted: a fake code gets invalid_grant).
+- `google:` block added to Consul `apps/ecom-api/prod/config.yml` (via Tailscale, check-and-set, only that block changed).
+- Left: a real Google sign-in by the user, then merge + deploy both repos (API first); publish the Google consent screen.
+- Same day, per the user ("don't want separate page for google sso"): no sign-in page any more. Header/menu/wishlist/reviews
+  "Sign in" start Google directly; `/account` signed out auto-starts it (cancel returns home, so no loop); callback page is a
+  spinner only, errors come back as a toast on the page they started from.
+- Sign-in/out feedback: callback shows "Welcome back, <first name>" / "Welcome to Scentology" after landing; failures toast for
+  10 s after landing. Account → Sign out goes to `/` first, then clears the session and toasts "Signed out" (signing out
+  in place would show the account page's Google fallback). Staff emails (e.g. the owner's Gmail, a super_admin) are refused
+  Google sign-in by design; test with a non-staff Google account.
+- Profile photo: users have `picture` (API json/bson, from the Google ID token's `picture` claim, resized to `=s256-c`,
+  https only), refreshed on every Google sign-in (changed or removed on Google follows). Storefront `UiAvatar` shows it
+  (header pill, account sidebar, phone menu) with `referrerpolicy="no-referrer"`, initials on gold as the fallback; it also
+  checks on mount because an SSR-rendered <img> can fail before Vue attaches @error.

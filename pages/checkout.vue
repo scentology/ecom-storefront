@@ -65,7 +65,6 @@ const init = async () => {
   } catch (e) { error.value = e.message }
 }
 onMounted(init)
-const onSignedIn = () => init()
 
 const saveAddress = async () => {
   addrError.value = ''; addrFields.value = null
@@ -182,7 +181,10 @@ const place = async () => {
               <p><span class="text-ink-soft">Signed in as</span> <strong>{{ auth.user.value?.name || auth.user.value?.email }}</strong> <span class="text-ink-faint break-all">{{ auth.user.value?.email || localPhone(auth.user.value?.phone) }}</span></p>
               <button class="text-ink-soft underline" @click="auth.signOut(); addresses = []">Not you?</button>
             </div>
-            <div v-else class="mt-6 max-w-sm"><AuthEmailSignIn @done="onSignedIn" /></div>
+            <div v-else class="mt-6 max-w-sm">
+              <AuthGoogleSignIn text="continue" block next="/checkout" />
+              <p class="text-xs text-ink-faint mt-3">No password needed. New here? Your account is made when you first sign in.</p>
+            </div>
           </ClientOnly>
         </section>
 

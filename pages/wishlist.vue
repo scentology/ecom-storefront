@@ -56,7 +56,7 @@ const addToBag = (e) => cart.add({
       <div v-if="!auth.signedIn.value" class="mt-8 flex flex-col gap-3 rounded-2xl bg-white ring-1 ring-line px-5 py-4 sm:flex-row sm:items-center">
         <Icon name="lucide:cloud" class="w-5 h-5 text-gold-dark shrink-0" />
         <p class="text-sm text-ink-soft flex-1">Sign in to keep your wishlist on every device. What you've saved here comes with you.</p>
-        <NuxtLink to="/account?next=/wishlist" class="s-btn-line !py-2 !px-5 self-start sm:self-auto">Sign in</NuxtLink>
+        <AuthGoogleSignIn class="self-start sm:self-auto" />
       </div>
 
       <div v-if="loading && !entries.length" class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">

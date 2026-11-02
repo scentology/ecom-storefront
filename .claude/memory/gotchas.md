@@ -13,3 +13,8 @@
 - **Customers sign in by email, not phone** (2026-09-30): the account has no phone. Orders still need `customer_phone`: delivery takes it from the address, store collection from the pickup phone field.
 
 - Headless Chrome can't size a window under ~500px: phone screenshots need CDP `Emulation.setDeviceMetricsOverride` (a 390px `--window-size` silently renders wider and looks like overflow).
+
+- **The Google button follows Google's branding guidelines** (`components/auth/GoogleSignIn.vue`: standard four-colour G, "Sign in with Google" /
+  "Continue with Google" only, Roboto 500 14/20, 40px pill, light #FFF/#747775/#1F1F1F or dark #131314/#8E918F/#E3E3E3). Never
+  restyle it with brand classes (`s-btn*`) or plain "Sign in": Google reviews it for the OAuth consent screen. Its scoped
+  `display` beats Tailwind's `hidden`, so hide it with a wrapper element, not a class on the component.

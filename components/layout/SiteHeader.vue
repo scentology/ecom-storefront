@@ -78,7 +78,10 @@ const compact = computed(() => (items.value?.length || 0) > 5)
           <Icon name="lucide:shopping-bag" class="w-5 h-5" />
           <ClientOnly><span v-if="cart.count.value" class="absolute top-1 right-0.5 min-w-4 h-4 px-1 rounded-full bg-gold text-noir-900 text-[0.62rem] font-bold flex items-center justify-center">{{ cart.count.value }}</span></ClientOnly>
         </button>
-        <NuxtLink to="/account" class="hidden md:inline-flex ml-2 s-btn border border-white/30 !px-5 !py-2 hover:border-gold hover:text-gold"><ClientOnly fallback="Sign in">{{ auth.signedIn.value ? (auth.user.value?.name?.split(" ")[0] || "Account") : "Sign in" }}</ClientOnly></NuxtLink>
+        <NuxtLink v-if="auth.signedIn.value" to="/account" class="hidden md:inline-flex items-center gap-2.5 ml-2 h-10 rounded-full border border-white/30 pl-1 pr-4 text-sm font-medium hover:border-gold hover:text-gold transition" :title="auth.user.value?.email || 'My account'">
+          <UiAvatar :user="auth.user.value" class="w-8 h-8 text-xs" />{{ auth.user.value?.name?.split(" ")[0] || "Account" }}
+        </NuxtLink>
+        <div v-else class="hidden md:block ml-2"><AuthGoogleSignIn theme="dark" /></div>
       </div>
     </div>
 

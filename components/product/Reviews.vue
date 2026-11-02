@@ -22,7 +22,7 @@ const hover = ref(0)
 const busy = ref(false)
 const error = ref('')
 const start = async () => {
-  if (!auth.signedIn.value) return navigateTo({ path: '/account', query: { next: useRoute().fullPath } })
+  if (!auth.signedIn.value) return auth.signIn()
   error.value = ''
   try {
     eligibility.value = (await auth.request(`/reviews/product/${props.productId}/mine`)).data
