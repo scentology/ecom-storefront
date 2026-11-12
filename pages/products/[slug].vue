@@ -80,7 +80,9 @@ const allSeasons = computed(() => attributes.value.find((a) => a.slug === 'seaso
 const occasions = computed(() => valuesOf(attributes.value, p.value, 'occasion'))
 const perf = computed(() => p.value.performance || {})
 const accords = computed(() => p.value.accords || [])
-const hasProfile = computed(() => accords.value.length || notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
+// rated per season and day / night (icon + bar); products without ratings fall back to their Season attribute
+const wear = computed(() => p.value.when_to_wear || [])
+const hasProfile = computed(() => accords.value.length || wear.value.length || notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
 const hasAbout = computed(() => p.value.description || details.value.length || p.value.features?.length)
 
 // size guide: an option named Size + a chart on the sub category (else the category)
@@ -280,7 +282,7 @@ useHead({
         </ol>
       </div>
 
-      <div v-if="perf.longevity || perf.projection || seasons.length || occasions.length" class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <div v-if="perf.longevity || perf.projection || wear.length || seasons.length || occasions.length" class="grid lg:grid-cols-2 gap-10 lg:gap-16">
         <div v-if="perf.longevity || perf.projection" v-reveal="'left'">
           <h2 class="s-title text-3xl text-noir-800">Performance</h2>
           <div v-for="m in [{ k: 'Longevity', v: perf.longevity, max: 5, scale: LONGEVITY }, { k: 'Projection', v: perf.projection, max: 4, scale: PROJECTION }].filter((x) => x.v)" :key="m.k" class="mt-6">
@@ -291,9 +293,10 @@ useHead({
             <p class="text-xs text-ink-faint mt-1.5">{{ m.scale[m.v].hint }}</p>
           </div>
         </div>
-        <div v-if="seasons.length || occasions.length" v-reveal="'right'">
+        <div v-if="wear.length || seasons.length || occasions.length" v-reveal="'right'">
           <h2 class="s-title text-3xl text-noir-800">When to wear</h2>
-          <div v-if="allSeasons.length" class="flex flex-wrap gap-5 mt-6">
+          <ProductWhenToWear v-if="wear.length" :ratings="wear" class="mt-6" />
+          <div v-else-if="allSeasons.length" class="flex flex-wrap gap-5 mt-6">
             <NuxtLink v-for="s in allSeasons" :key="s.slug" :to="`/products?f.season=${s.slug}`" class="text-center group" :class="seasons.some((x) => x.slug === s.slug) ? '' : 'opacity-35'">
               <span class="w-14 h-14 rounded-full flex items-center justify-center transition" :class="seasons.some((x) => x.slug === s.slug) ? 'bg-noir-800 text-gold-light' : 'bg-cream-deep text-ink-faint'">
                 <Icon :name="s.icon || 'lucide:calendar'" class="w-5 h-5" />

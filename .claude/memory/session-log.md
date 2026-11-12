@@ -163,3 +163,8 @@
 
 - `ProductAccords`: coloured bars from `product.accords`, strongest first, first block of the fragrance profile.
 - Order page shows "Paid in advance" when part of an order is paid and the rest is due.
+
+## 2026-11-13 (later) — When to wear bars (branch feat/when-to-wear)
+
+- `ProductWhenToWear`: icon + coloured bar per season and day / night from `product.when_to_wear`, no numbers. Products
+  without ratings keep the Season attribute icons. Occasion chips stay under either.
