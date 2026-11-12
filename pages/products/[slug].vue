@@ -79,7 +79,8 @@ const seasons = computed(() => valuesOf(attributes.value, p.value, 'season'))
 const allSeasons = computed(() => attributes.value.find((a) => a.slug === 'season')?.values || [])
 const occasions = computed(() => valuesOf(attributes.value, p.value, 'occasion'))
 const perf = computed(() => p.value.performance || {})
-const hasProfile = computed(() => notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
+const accords = computed(() => p.value.accords || [])
+const hasProfile = computed(() => accords.value.length || notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
 const hasAbout = computed(() => p.value.description || details.value.length || p.value.features?.length)
 
 // size guide: an option named Size + a chart on the sub category (else the category)
@@ -256,6 +257,14 @@ useHead({
 
     <!-- fragrance profile -->
     <section v-if="hasProfile" class="s-container py-12 border-t border-line space-y-14">
+      <div v-if="accords.length" class="grid lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] gap-6 lg:gap-16 items-start">
+        <div>
+          <h2 class="s-title text-3xl text-noir-800">Main accords</h2>
+          <p class="text-sm text-ink-soft mt-3">What this scent is made of at a glance: the longer the bar, the more it stands out.</p>
+        </div>
+        <ProductAccords v-reveal="'up'" :accords="accords" class="max-w-xl w-full" />
+      </div>
+
       <div v-if="notes.length">
         <h2 class="s-title text-3xl text-noir-800">Notes</h2>
         <ol class="mt-6 grid sm:grid-cols-3 gap-4">

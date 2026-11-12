@@ -158,3 +158,8 @@
   https only), refreshed on every Google sign-in (changed or removed on Google follows). Storefront `UiAvatar` shows it
   (header pill, account sidebar, phone menu) with `referrerpolicy="no-referrer"`, initials on gold as the fallback; it also
   checks on mount because an SSR-rendered <img> can fail before Vue attaches @error.
+
+## 2026-11-13 — Main accords on the product page (branch feat/accords-phone-orders-advance, not committed)
+
+- `ProductAccords`: coloured bars from `product.accords`, strongest first, first block of the fragrance profile.
+- Order page shows "Paid in advance" when part of an order is paid and the rest is due.

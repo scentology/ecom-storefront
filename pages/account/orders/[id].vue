@@ -105,6 +105,7 @@ watch(order, async (o) => {
               <div class="flex justify-between"><dt class="text-ink-soft">Subtotal</dt><dd>{{ money(order.sales_amount) }}</dd></div>
               <div class="flex justify-between"><dt class="text-ink-soft">Delivery</dt><dd>{{ money(order.delivery_fee) }}</dd></div>
               <div class="flex justify-between font-semibold pt-2 border-t border-line"><dt>Total</dt><dd>{{ money(order.grand_total) }}</dd></div>
+              <div v-if="order.paid_amount > 0 && order.due_amount > 0" class="flex justify-between"><dt class="text-ink-soft">Paid in advance</dt><dd>{{ money(order.paid_amount) }}</dd></div>
               <div v-if="order.due_amount > 0 && order.status !== 'DELIVERED'" class="flex justify-between"><dt class="text-ink-soft">{{ pickup ? 'To pay when you collect' : 'To pay on delivery' }}</dt><dd>{{ money(order.due_amount) }}</dd></div>
             </dl>
             <div v-if="pickup" class="rounded-2xl bg-white ring-1 ring-line p-5 text-sm">

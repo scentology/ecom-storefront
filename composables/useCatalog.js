@@ -89,7 +89,7 @@ export const loadShop = () => useAsyncData('shop', async () => (await api('/stor
 /** Whether a product is a fragrance: it has a notes pyramid, performance, or fragrance-only facets. */
 export const isFragrance = (p) => {
   const n = p?.notes || {}
-  if ((n.top?.length || n.heart?.length || n.base?.length) || p?.performance?.longevity || p?.performance?.projection) return true
+  if ((n.top?.length || n.heart?.length || n.base?.length) || p?.performance?.longevity || p?.performance?.projection || p?.accords?.length) return true
   if (['notes', 'concentration', 'family'].some((a) => p?.facets?.[a]?.length)) return true
   return /fragrance|perfume|attar/i.test(`${p?.category?.slug || ''} ${p?.sub_category?.slug || ''}`)
 }
