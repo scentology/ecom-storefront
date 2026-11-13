@@ -16,7 +16,7 @@ const ink = (hex) => {
   <ul v-if="list.length" class="space-y-0.5" aria-label="Main accords, strongest first">
     <li
       v-for="a in list" :key="a.name"
-      class="accord h-8 sm:h-9 flex items-center justify-center px-3 text-sm sm:text-[15px] leading-none whitespace-nowrap overflow-hidden rounded-r-lg"
+      class="accord h-6 flex items-center justify-center px-2.5 text-xs leading-none whitespace-nowrap overflow-hidden rounded-r-md"
       :style="{ width: Math.max(a.percent, 24) + '%', background: a.colour, color: ink(a.colour) }"
       :title="`${a.name}: ${a.percent}%`"
     >

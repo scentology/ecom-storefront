@@ -75,14 +75,12 @@ const notes = computed(() => [
   { k: 'Heart', hint: 'Once it settles', list: p.value.notes?.heart || [] },
   { k: 'Base', hint: 'What lingers', list: p.value.notes?.base || [] },
 ].filter((t) => t.list.length))
-const seasons = computed(() => valuesOf(attributes.value, p.value, 'season'))
-const allSeasons = computed(() => attributes.value.find((a) => a.slug === 'season')?.values || [])
 const occasions = computed(() => valuesOf(attributes.value, p.value, 'occasion'))
 const perf = computed(() => p.value.performance || {})
 const accords = computed(() => p.value.accords || [])
-// rated per season and day / night (icon + bar); products without ratings fall back to their Season attribute
+// rated per season and day / night (icon + bar); shown only once something is rated
 const wear = computed(() => p.value.when_to_wear || [])
-const hasProfile = computed(() => accords.value.length || wear.value.length || notes.value.length || perf.value.longevity || perf.value.projection || seasons.value.length || occasions.value.length)
+const hasProfile = computed(() => wear.value.length || notes.value.length || perf.value.longevity || perf.value.projection || occasions.value.length)
 const hasAbout = computed(() => p.value.description || details.value.length || p.value.features?.length)
 
 // size guide: an option named Size + a chart on the sub category (else the category)
@@ -230,6 +228,11 @@ useHead({
           <li class="rounded-xl bg-white ring-1 ring-line p-4 flex gap-3"><Icon name="lucide:badge-check" class="w-5 h-5 text-noir-800 shrink-0" /> {{ fragrance ? '100% authentic' : 'Quality checked' }}</li>
         </ul>
 
+        <!-- main accords: a compact block under the buy box -->
+        <div v-if="accords.length" class="mt-8 max-w-sm">
+          <h2 class="s-eyebrow text-gold-dark">Main accords</h2>
+          <ProductAccords :accords="accords" class="mt-3" />
+        </div>
       </div>
     </section>
 
@@ -259,14 +262,6 @@ useHead({
 
     <!-- fragrance profile -->
     <section v-if="hasProfile" class="s-container py-12 border-t border-line space-y-14">
-      <div v-if="accords.length" class="grid lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] gap-6 lg:gap-16 items-start">
-        <div>
-          <h2 class="s-title text-3xl text-noir-800">Main accords</h2>
-          <p class="text-sm text-ink-soft mt-3">What this scent is made of at a glance: the longer the bar, the more it stands out.</p>
-        </div>
-        <ProductAccords v-reveal="'up'" :accords="accords" class="max-w-xl w-full" />
-      </div>
-
       <div v-if="notes.length">
         <h2 class="s-title text-3xl text-noir-800">Notes</h2>
         <ol class="mt-6 grid sm:grid-cols-3 gap-4">
@@ -282,7 +277,7 @@ useHead({
         </ol>
       </div>
 
-      <div v-if="perf.longevity || perf.projection || wear.length || seasons.length || occasions.length" class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <div v-if="perf.longevity || perf.projection || wear.length || occasions.length" class="grid lg:grid-cols-2 gap-10 lg:gap-16">
         <div v-if="perf.longevity || perf.projection" v-reveal="'left'">
           <h2 class="s-title text-3xl text-noir-800">Performance</h2>
           <div v-for="m in [{ k: 'Longevity', v: perf.longevity, max: 5, scale: LONGEVITY }, { k: 'Projection', v: perf.projection, max: 4, scale: PROJECTION }].filter((x) => x.v)" :key="m.k" class="mt-6">
@@ -293,17 +288,9 @@ useHead({
             <p class="text-xs text-ink-faint mt-1.5">{{ m.scale[m.v].hint }}</p>
           </div>
         </div>
-        <div v-if="wear.length || seasons.length || occasions.length" v-reveal="'right'">
+        <div v-if="wear.length || occasions.length" v-reveal="'right'">
           <h2 class="s-title text-3xl text-noir-800">When to wear</h2>
           <ProductWhenToWear v-if="wear.length" :ratings="wear" class="mt-6" />
-          <div v-else-if="allSeasons.length" class="flex flex-wrap gap-5 mt-6">
-            <NuxtLink v-for="s in allSeasons" :key="s.slug" :to="`/products?f.season=${s.slug}`" class="text-center group" :class="seasons.some((x) => x.slug === s.slug) ? '' : 'opacity-35'">
-              <span class="w-14 h-14 rounded-full flex items-center justify-center transition" :class="seasons.some((x) => x.slug === s.slug) ? 'bg-noir-800 text-gold-light' : 'bg-cream-deep text-ink-faint'">
-                <Icon :name="s.icon || 'lucide:calendar'" class="w-5 h-5" />
-              </span>
-              <span class="block text-xs mt-2 font-semibold">{{ s.label }}</span>
-            </NuxtLink>
-          </div>
           <div v-if="occasions.length" class="flex flex-wrap gap-2 mt-6">
             <NuxtLink v-for="o in occasions" :key="o.slug" :to="`/products?f.occasion=${o.slug}`" class="s-chip !py-1.5 !text-xs">{{ o.label }}</NuxtLink>
           </div>
